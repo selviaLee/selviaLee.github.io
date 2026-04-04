@@ -1,1 +1,35 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>닉네임 입력</title>
+  <link rel="stylesheet" href="nickname.css" />
+</head>
+<body>
+  <main class="nickname-page">
+    <section class="nickname-card">
+      <div class="mini-logo">MG</div>
 
+      <p id="modeLabel" class="mode-label">방 참여</p>
+      <h1 class="nickname-title">닉네임 입력</h1>
+      <p class="nickname-subtitle">팝업 없이 여기서 바로 입력합니다.</p>
+
+      <form id="nicknameForm" class="nickname-form">
+        <label class="field-label">닉네임</label>
+        <input id="nicknameInput" class="text-input" type="text" maxlength="20" placeholder="예: 철수" />
+
+        <div id="codeArea" class="code-area">
+          <label class="field-label">초대코드</label>
+          <input id="roomCodeInput" class="text-input" type="text" maxlength="6" placeholder="예: A1B2C3" />
+        </div>
+
+        <button type="submit" id="submitBtn" class="submit-btn">다음으로</button>
+        <button type="button" id="goBackBtn" class="back-btn">뒤로가기</button>
+      </form>
+    </section>
+  </main>
+
+  <script type="module" src="nickname.js"></script>
+</body>
+</html>
