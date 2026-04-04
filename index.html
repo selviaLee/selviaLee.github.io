@@ -1,6 +1,57 @@
-<html>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MiniGame</title>
+<link rel="stylesheet" href="style.css">
+</head>
+
 <body>
-  hello world
+
+<div id="home" class="center">
+  <div class="box">
+    <h1>MiniGame</h1>
+    <button id="createRoom">새 방 만들기</button>
+    <button id="joinRoom">기존 방 참여하기</button>
+  </div>
+</div>
+
+<div id="room" class="hidden">
+
+  <div class="topbar">
+    초대코드: <span id="roomCode"></span>
+    <button id="copyCode">복사</button>
+  </div>
+
+  <div class="container">
+
+    <div class="card">
+      <h3>참가자</h3>
+      <ul id="participants"></ul>
+    </div>
+
+    <div class="card">
+      <h3>텍스트 목록</h3>
+      <textarea id="textList" placeholder="한 줄에 하나씩 입력"></textarea>
+    </div>
+
+    <div class="card">
+      <button id="startGame">시작하기</button>
+      <button id="revealAll">전체 공개</button>
+      <button id="newGame">새 게임</button>
+      <button id="destroyRoom">방 폭파</button>
+    </div>
+
+    <div class="card">
+      <button id="viewMine">내 텍스트 보기</button>
+      <div id="myText"></div>
+    </div>
+
+  </div>
+
+</div>
+
+<script type="module" src="script.js"></script>
 </body>
-  
 </html>
