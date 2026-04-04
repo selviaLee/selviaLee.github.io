@@ -43,6 +43,10 @@ const viewMineBtn = document.getElementById("viewMineBtn");
 const revealBadge = document.getElementById("revealBadge");
 const revealList = document.getElementById("revealList");
 
+const dummyControlBox = document.getElementById("dummyControlBox");
+const dummyCountInput = document.getElementById("dummyCountInput");
+const createDummyBtn = document.getElementById("createDummyBtn");
+
 let currentUser = null;
 let myNickname = localStorage.getItem("mg_nickname") || "";
 let roomData = null;
@@ -80,13 +84,65 @@ function statusText(status) {
   return "-";
 }
 
+function isDummyParticipant(p) {
+  return !!p.isDummy;
+}
+
+function nextDummyNumber() {
+  const nums = participantsCache
+    .filter(isDummyParticipant)
+    .map(p => {
+      const match = String(p.nickname || "").match(/^더미(\d+)/);
+      return match ? Number(match[1]) : 0;
+    })
+    .filter(n => Number.isFinite(n) && n > 0);
+
+  return nums.length ? Math.max(...nums) + 1 : 1;
+}
+
 function renderParticipants() {
   participantsList.innerHTML = "";
   participantCountEl.textContent = `${participantsCache.length}명`;
 
   participantsCache.forEach(p => {
     const li = document.createElement("li");
-    li.textContent = p.nickname + (p.uid === roomData?.gmUid ? " (방장)" : "");
+    const row = document.createElement("div");
+    row.className = "participant-row";
+
+    const nameWrap = document.createElement("div");
+    nameWrap.className = "participant-name";
+
+    const nameText = document.createElement("span");
+    let label = p.nickname || "";
+    if (p.uid === roomData?.gmUid) {
+      label += " (방장)";
+    }
+    nameText.textContent = label;
+    nameWrap.appendChild(nameText);
+
+    if (isDummyParticipant(p)) {
+      const badge = document.createElement("span");
+      badge.className = "dummy-badge";
+      badge.textContent = "더미";
+      nameWrap.appendChild(badge);
+    }
+
+    row.appendChild(nameWrap);
+
+    if (isGM && isDummyParticipant(p)) {
+      const deleteBtn = document.createElement("button");
+      deleteBtn.className = "delete-dummy-btn";
+      deleteBtn.type = "button";
+      deleteBtn.textContent = "삭제";
+      deleteBtn.addEventListener("click", async () => {
+        const ok = confirm(`${p.nickname} 을(를) 삭제할까요?`);
+        if (!ok) return;
+        await deleteDummyParticipant(p.uid);
+      });
+      row.appendChild(deleteBtn);
+    }
+
+    li.appendChild(row);
     participantsList.appendChild(li);
   });
 }
@@ -110,6 +166,7 @@ function renderRoomInfo() {
 
   isGM = currentUser && roomData.gmUid === currentUser.uid;
   gmPanel.classList.toggle("hidden", !isGM);
+  dummyControlBox.classList.toggle("hidden", !isGM);
 
   if (roomData.revealed) {
     revealBadge.textContent = "공개됨";
@@ -226,6 +283,53 @@ async function reassignGMIfNeeded(leavingUid) {
   });
 }
 
+async function deleteDummyParticipant(uid) {
+  await deleteDoc(doc(db, "rooms", roomCode, "participants", uid));
+
+  const assignmentRef = doc(db, "rooms", roomCode, "assignments", uid);
+  const assignmentSnap = await getDoc(assignmentRef);
+  if (assignmentSnap.exists()) {
+    await deleteDoc(assignmentRef);
+  }
+
+  await updateDoc(doc(db, "rooms", roomCode), {
+    updatedAt: serverTimestamp()
+  });
+}
+
+async function createDummyParticipants() {
+  if (!isGM) return;
+
+  const count = Number(dummyCountInput.value);
+  if (!Number.isInteger(count) || count < 1) {
+    alert("더미 수를 1 이상 입력하세요.");
+    return;
+  }
+
+  let startNum = nextDummyNumber();
+
+  for (let i = 0; i < count; i++) {
+    const dummyUid = `dummy_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
+    const dummyName = `더미${startNum + i}`;
+
+    await setDoc(doc(db, "rooms", roomCode, "participants", dummyUid), {
+      uid: dummyUid,
+      nickname: dummyName,
+      isDummy: true,
+      revealedMine: false,
+      joinedAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+  }
+
+  dummyCountInput.value = "";
+  await updateDoc(doc(db, "rooms", roomCode), {
+    updatedAt: serverTimestamp()
+  });
+
+  alert("더미 참가자가 생성되었습니다.");
+}
+
 async function leaveRoom() {
   if (leavingHandled || !currentUser) return;
   leavingHandled = true;
@@ -257,6 +361,7 @@ async function init() {
   await setDoc(doc(db, "rooms", roomCode, "participants", currentUser.uid), {
     uid: currentUser.uid,
     nickname: myNickname,
+    isDummy: false,
     revealedMine: false,
     joinedAt: serverTimestamp(),
     updatedAt: serverTimestamp()
@@ -369,6 +474,7 @@ startBtn.addEventListener("click", async () => {
     await setDoc(doc(db, "rooms", roomCode, "assignments", p.uid), {
       uid: p.uid,
       nickname: p.nickname,
+      isDummy: !!p.isDummy,
       text: shuffledTexts[i],
       opened: false
     });
@@ -470,5 +576,7 @@ transferBtn.addEventListener("click", async () => {
 
   alert("방장이 양도되었습니다.");
 });
+
+createDummyBtn.addEventListener("click", createDummyParticipants);
 
 init();
