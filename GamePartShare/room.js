@@ -1,4 +1,3 @@
-
 import { auth, db, ensureAnonymousAuth } from "./firebase-config.js";
 import {
   doc,
@@ -51,6 +50,7 @@ let participantsCache = [];
 let textsCache = [];
 let assignmentsCache = [];
 let isGM = false;
+let leavingHandled = false;
 
 if (!roomCode) {
   alert("방 코드가 없습니다.");
@@ -159,21 +159,12 @@ function renderMyAssignment(showActual = false) {
 async function ensureRoomExists() {
   const snap = await getDoc(doc(db, "rooms", roomCode));
   if (!snap.exists()) {
+    localStorage.removeItem("mg_room_code");
     alert("존재하지 않는 방입니다.");
     location.href = "index.html";
     return false;
   }
   return true;
-}
-
-async function markConnected(value) {
-  if (!currentUser) return;
-  await setDoc(doc(db, "rooms", roomCode, "participants", currentUser.uid), {
-    uid: currentUser.uid,
-    nickname: myNickname,
-    connected: value,
-    updatedAt: serverTimestamp()
-  }, { merge: true });
 }
 
 async function maybeAutoDestroyRoom() {
@@ -185,9 +176,7 @@ async function maybeAutoDestroyRoom() {
   if (room.status !== "revealed") return;
 
   const partsSnap = await getDocs(collection(db, "rooms", roomCode, "participants"));
-  const connectedCount = partsSnap.docs.filter(d => d.data().connected === true).length;
-
-  if (connectedCount === 0) {
+  if (partsSnap.empty) {
     await destroyRoomCompletely(false);
   }
 }
@@ -215,28 +204,59 @@ async function destroyRoomCompletely(confirmFirst = true) {
   location.href = "index.html";
 }
 
+async function reassignGMIfNeeded(leavingUid) {
+  const roomRef = doc(db, "rooms", roomCode);
+  const roomSnap = await getDoc(roomRef);
+  if (!roomSnap.exists()) return;
+
+  const room = roomSnap.data();
+  if (room.gmUid !== leavingUid) return;
+
+  const partsSnap = await getDocs(query(collection(db, "rooms", roomCode, "participants"), orderBy("joinedAt")));
+  const remaining = partsSnap.docs.map(d => d.data());
+
+  if (remaining.length === 0) return;
+
+  const nextGM = remaining[0];
+
+  await updateDoc(roomRef, {
+    gmUid: nextGM.uid,
+    gmNickname: nextGM.nickname,
+    updatedAt: serverTimestamp()
+  });
+}
+
+async function leaveRoom() {
+  if (leavingHandled || !currentUser) return;
+  leavingHandled = true;
+
+  try {
+    await deleteDoc(doc(db, "rooms", roomCode, "participants", currentUser.uid));
+    await reassignGMIfNeeded(currentUser.uid);
+    await maybeAutoDestroyRoom();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 async function init() {
   await ensureAnonymousAuth();
   currentUser = auth.currentUser;
 
-  if (!myNickname) {
-    myNickname = prompt("닉네임 정보가 없어 다시 입력합니다.");
-    if (!myNickname) {
-      location.href = "index.html";
-      return;
-    }
-    localStorage.setItem("mg_nickname", myNickname);
-  }
-
   const exists = await ensureRoomExists();
   if (!exists) return;
+
+  if (!myNickname) {
+    alert("닉네임 정보가 없습니다. 다시 입장해 주세요.");
+    location.href = "index.html";
+    return;
+  }
 
   myNicknameEl.textContent = myNickname;
 
   await setDoc(doc(db, "rooms", roomCode, "participants", currentUser.uid), {
     uid: currentUser.uid,
     nickname: myNickname,
-    connected: true,
     revealedMine: false,
     joinedAt: serverTimestamp(),
     updatedAt: serverTimestamp()
@@ -246,6 +266,7 @@ async function init() {
 
   onSnapshot(roomRef, (snap) => {
     if (!snap.exists()) {
+      localStorage.removeItem("mg_room_code");
       alert("방이 삭제되었습니다.");
       location.href = "index.html";
       return;
@@ -282,14 +303,8 @@ async function init() {
     }
   );
 
-  window.addEventListener("beforeunload", async () => {
-    try {
-      await markConnected(false);
-      await maybeAutoDestroyRoom();
-    } catch (e) {
-      console.error(e);
-    }
-  });
+  window.addEventListener("pagehide", leaveRoom);
+  window.addEventListener("beforeunload", leaveRoom);
 }
 
 saveTextsBtn.addEventListener("click", async () => {
