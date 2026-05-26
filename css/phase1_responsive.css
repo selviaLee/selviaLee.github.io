@@ -1,0 +1,209 @@
+﻿@media (max-width: 920px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    position: static;
+    height: auto;
+  }
+
+  .nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .sidebar-foot {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .main {
+    padding: 18px;
+  }
+
+  .stepper,
+  .grid.two,
+  .grid.three,
+  .work-basic-grid,
+  .schedule-row,
+  .choice-cards,
+  .confirm-layout,
+  .genre-display-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cover-settings-layout {
+    grid-template-columns: 146px minmax(0, 1fr);
+  }
+
+  .cover-choice-scroll {
+    grid-auto-columns: 128px;
+  }
+
+  .my-cover-panel {
+    width: 128px;
+  }
+
+  .work-card {
+    grid-template-columns: 140px minmax(0, 1fr);
+  }
+
+  .work-content {
+    grid-column: 1 / -1;
+  }
+
+  .work-info-row {
+    grid-template-columns: 140px minmax(0, 1fr);
+  }
+
+  .work-card .work-actions {
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+
+  .work-stat-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 680px) {
+  .topbar,
+  .notice-card,
+  .queue-head {
+    display: grid;
+  }
+
+  .topbar h1 {
+    font-size: 23px;
+  }
+
+  .work-card,
+  .work-info-row {
+    grid-template-columns: 1fr;
+  }
+
+  .work-card .cover {
+    width: min(180px, 100%);
+  }
+
+  .cover-settings-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .my-cover-panel {
+    width: 124px;
+    padding-right: 0;
+    border-right: 0;
+  }
+
+  .my-cover-panel::after {
+    display: none;
+  }
+
+  .cover-choice-scroll {
+    grid-auto-columns: 124px;
+  }
+
+  .work-actions,
+  .toolbar-right,
+  .step-actions,
+  .editor-tools {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .work-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .work-tag-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .work-actions button,
+  .toolbar-right button,
+  .step-actions button,
+  .editor-tools button {
+    width: 100%;
+  }
+
+  .register-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .register-actions button {
+    width: auto;
+  }
+
+  .status-filter {
+    width: 100%;
+  }
+
+  .status-filter-wrap {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .world-card-head {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .world-card-head small {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .notice-target-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .publish-zone-title,
+  .queue-list-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .queue-table {
+    display: block;
+    overflow-x: auto;
+  }
+
+  .queue-table th:last-child,
+  .queue-table td:last-child {
+    width: 250px;
+  }
+
+  .nav,
+  .sidebar-foot,
+  .official-name-line,
+  .temporary-name-row,
+  .item-row,
+  .item-compact-row,
+  .world-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-block.compact-status,
+  .settings-block.shop-line {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .character-line.main {
+    grid-template-columns: 42px minmax(0, 1fr) auto;
+  }
+
+  .character-line.main span {
+    grid-column: 2 / -1;
+  }
+}
+
+@media (max-width: 420px) {
+  .work-actions,
+  .work-stat-grid {
+    grid-template-columns: 1fr;
+  }
+}
