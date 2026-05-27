@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>숲글 골드 충전 상점</title>
+    <link rel="stylesheet" href="./css/phase7_gold_shop_charge_view.css" />
+  </head>
+  <body>
+    <header class="shop-header">
+      <a href="./phase2_alpha_front_home.html">← 홈</a>
+      <strong>상점</strong>
+      <span id="shopGoldBalance">0골드</span>
+    </header>
+
+    <main class="shop-page">
+      <section class="shop-title" aria-labelledby="chargeTitle">
+        <p>ALPHA TEST SHOP</p>
+        <h1 id="chargeTitle">골드 충전</h1>
+        <span>알파테스트에서는 실제 결제 없이 선택한 골드가 바로 충전됩니다.</span>
+      </section>
+
+      <section class="product-grid" id="productGrid" aria-label="골드 상품"></section>
+
+      <aside class="checkout-box" aria-label="충전 확인">
+        <div>
+          <span>선택 상품</span>
+          <strong id="selectedProductName">상품을 선택하세요</strong>
+        </div>
+        <div>
+          <span>결제 금액</span>
+          <strong id="selectedProductPrice">0원</strong>
+        </div>
+        <button type="button" id="chargeSelectedProduct">충전하기</button>
+      </aside>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./js/phase7_gold_shop_charge_app.js"></script>
+  </body>
+</html>

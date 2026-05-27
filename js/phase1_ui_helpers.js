@@ -67,4 +67,4 @@ export function bindModal() {
 export const statusText = (status) =>
   ({ draft: "습작", serializing: "연재", completed: "완결", queued: "대기열", confirmed: "연재확정", reserved: "연재확정", published: "공개됨" }[status] || status || "없음");
 
-export const typeText = (type) => (type === "interactive" ? "인터랙티브" : "일반");
+export const typeText = (type) => (type === "interactive" ? "갈래글" : "일반글");

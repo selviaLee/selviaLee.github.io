@@ -3,133 +3,113 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>숲글:숲갈래글 알파테스트</title>
+    <title>숲글:숲갈래글</title>
     <link rel="stylesheet" href="./css/phase2_alpha_front_home_view.css" />
   </head>
   <body>
-    <header class="site-header">
-      <div class="header-inner">
-        <a class="brand" href="./phase2_alpha_front_home.html" aria-label="숲글 홈">
-          <span class="brand-mark">숲</span>
-          <span>
-            <strong>숲글:숲갈래글 알파테스트</strong>
-            <small>글 중심 연재 실험실</small>
-          </span>
-        </a>
-        <nav class="top-nav" aria-label="주요 메뉴">
-          <button type="button" data-empty-action="홈">홈</button>
-          <button type="button" data-empty-action="탐색">탐색</button>
-          <button type="button" data-empty-action="베스트">베스트</button>
-          <button type="button" id="myPageButton">내 페이지</button>
-        </nav>
+    <header class="header">
+      <div class="header-left">
+        <button class="menu-button" type="button" data-empty-action="전체 메뉴" aria-label="전체 메뉴">☰</button>
+        <a class="logo" href="./phase2_alpha_front_home.html">숲글</a>
+        <label class="search-wrap">
+          <span aria-hidden="true">⌕</span>
+          <input class="search-bar" type="search" placeholder="검색어를 입력하세요." />
+        </label>
+      </div>
+
+      <div class="header-right">
+        <a class="btn-create" id="createWorkButton" href="./author_work_register.html">+ 작품생성</a>
+        <div class="icon-group" aria-label="상단 빠른 기능">
+          <button type="button" id="chargeGold" aria-label="충전하기">▣</button>
+          <button class="notice-icon" type="button" data-empty-action="알림" aria-label="알림">♧<span>4</span></button>
+          <button type="button" data-empty-action="쪽지" aria-label="쪽지">✉</button>
+        </div>
+        <button class="profile-circle" type="button" id="profileEntry" aria-label="로그인 또는 마이 메뉴">로그인</button>
+        <div class="profile-menu hidden" id="profileMenu" aria-label="프로필 메뉴">
+          <a href="./phase6_myhome_library.html">마이홈</a>
+          <a href="./author_work_list.html">작가작업실</a>
+          <button type="button" id="logoutUser">로그아웃</button>
+        </div>
       </div>
     </header>
 
-    <main class="page">
-      <section class="account-strip" aria-label="테스트 계정">
-        <div>
-          <p class="eyebrow">ALPHA TEST WALLET</p>
-          <h1>숲글:숲갈래글 알파테스트</h1>
-          <p class="summary">실제 결제 없이 내부 테스트 골드로 작품 구매 흐름을 점검합니다.</p>
-        </div>
-        <div class="account-panel">
-          <div class="login-row" id="loggedOutPanel">
-            <button class="login-btn naver" type="button" data-login="naver">네이버 로그인</button>
-            <button class="login-btn google" type="button" data-login="google">구글 로그인</button>
-          </div>
-          <div class="wallet hidden" id="loggedInPanel">
-            <div>
-              <span class="label">로그인</span>
-              <strong id="userName">테스트계정</strong>
-            </div>
-            <div>
-              <span class="label">보유 골드</span>
-              <strong id="goldBalance">0골드</strong>
-            </div>
-            <div class="wallet-actions">
-              <button class="charge-btn" type="button" id="chargeGold">충전하기</button>
-              <button class="plain-btn" type="button" id="logoutUser">로그아웃</button>
-            </div>
-          </div>
-          <p class="wallet-note">알파 테스트에서는 1원 = 1골드입니다. 충전하기는 5000골드를 즉시 지급합니다.</p>
-        </div>
-      </section>
+    <div class="main-container">
+      <aside class="pc-sidebar">
+        <nav class="user-shortcut-list" aria-label="홈 바로가기">
+          <a class="active" href="./phase2_alpha_front_home.html"><span>⌂</span>홈</a>
+          <button type="button" data-filter="paid"><span>◒</span>유료 베스트</button>
+          <button type="button" data-filter="free"><span>◇</span>무료 베스트</button>
+          <a href="./phase7_gold_shop_charge.html"><span>☻</span>상점</a>
+          <a href="./phase6_myhome_library.html"><span>▤</span>보관함</a>
+          <a href="./phase6_myhome_library.html"><span>▥</span>마이홈</a>
+          <a href="./author_work_list.html"><span>▦</span>작가작업실</a>
+        </nav>
 
-      <section class="my-page-panel hidden" id="myPagePanel" aria-label="내 페이지">
-        <div>
-          <p class="eyebrow">MY PAGE</p>
-          <h2>내 페이지</h2>
-          <p>테스트계정의 독자 기능과 작업실 기능을 확인합니다. 작업실은 작가 전용 화면이지만 모든 유저에게 기본으로 존재합니다.</p>
-        </div>
-        <div class="my-page-actions">
-          <a class="studio-link" href="./author_work_list.html">작업실</a>
-          <button type="button" data-empty-action="보관함">보관함</button>
-          <button type="button" data-empty-action="충전 내역">충전 내역</button>
-        </div>
-      </section>
-
-      <section class="notice-band">
-        <button type="button" data-empty-action="알파테스트 공지">
-          알파테스트 안내 · 결제 루틴은 추후 연결 예정이며 지금은 가상 화폐만 사용합니다.
+        <button class="left-extension-card" type="button" data-empty-action="왼쪽 확장 슬롯">
+          <strong>테스트 골드</strong>
+          <span>가상 포인트로 구매 흐름 확인</span>
         </button>
-      </section>
+      </aside>
 
-      <section class="quick-tabs" aria-label="빠른 분류">
-        <button type="button" class="active" data-filter="all">전체</button>
-        <button type="button" data-filter="free">무료</button>
-        <button type="button" data-filter="paid">유료</button>
-        <button type="button" data-filter="interactive">인터랙티브</button>
-        <button type="button" data-filter="updated">최신 업데이트</button>
-      </section>
+      <main class="content-area">
+        <nav class="main-menu-tabs" aria-label="홈 분류">
+          <button class="menu-tab-item active" type="button" data-filter="all">전체</button>
+          <button class="menu-tab-item" type="button" data-filter="updated">최근 갱신</button>
+          <button class="menu-tab-item" type="button" data-filter="interactive">갈래글</button>
+          <button class="menu-tab-item" type="button" data-filter="general">일반글</button>
+          <span class="tab-spacer"></span>
+          <button class="menu-tab-item genre-filter" type="button" data-empty-action="장르필터">장르필터</button>
+        </nav>
 
-      <section class="top-paid" aria-labelledby="paidBestTitle">
-        <div class="section-head">
-          <div>
-            <p class="eyebrow">BEST 3</p>
-            <h2 id="paidBestTitle">유료베스트 TOP 3</h2>
-          </div>
-          <button type="button" data-empty-action="유료베스트 더보기">더보기</button>
-        </div>
-        <div class="cover-rank-grid" id="paidBestGrid"></div>
-      </section>
+        <section class="notice-line" aria-label="알파테스트 안내">
+          <button type="button" data-empty-action="테스트 공지">
+            결제 루틴은 아직 연결하지 않고, 사이트 내부 가상 골드만 사용합니다.
+          </button>
+        </section>
 
-      <section class="content-grid">
-        <article class="feed-section">
+        <section class="best-strip" aria-labelledby="bestTitle">
           <div class="section-head">
-            <div>
-              <p class="eyebrow">TEXT FEED</p>
-              <h2>지금 읽을 작품</h2>
-            </div>
-            <button type="button" data-empty-action="작품 필터">필터</button>
+            <h1 id="bestTitle">유료 베스트</h1>
+            <button type="button" data-empty-action="유료 베스트 더보기">더보기</button>
           </div>
-          <div class="list-toolbar">
+          <div class="cover-rank-grid" id="paidBestGrid"></div>
+        </section>
+
+        <section class="work-feed" aria-labelledby="workFeedTitle">
+          <div class="section-head">
+            <h2 id="workFeedTitle">지금 읽을 작품</h2>
             <span id="filterLabel">전체 목록</span>
-            <span>표지 없이 제목과 상태를 먼저 봅니다.</span>
           </div>
           <div class="work-list" id="workList"></div>
-        </article>
+        </section>
+      </main>
 
-        <aside class="side-feed">
-          <section>
-            <div class="section-head compact">
-              <h2>실시간 반응</h2>
-              <button type="button" data-empty-action="댓글 더보기">더보기</button>
-            </div>
-            <ul class="reaction-list" id="reactionList"></ul>
-          </section>
-          <section>
-            <div class="section-head compact">
-              <h2>작가 도구</h2>
-            </div>
-            <div class="tool-stack">
-              <a href="./author_work_list.html">작가 작업실 열기</a>
-              <button type="button" data-empty-action="새 작품 등록">새 작품 등록</button>
-              <button type="button" data-empty-action="정산">정산</button>
-            </div>
-          </section>
-        </aside>
-      </section>
-    </main>
+      <aside class="pc-rightbar" aria-label="개인 목록">
+        <section class="wallet-card" id="walletCard" aria-label="내 보유 골드">
+          <div class="wallet-info">
+            <span id="walletUserName">로그인이 필요합니다</span>
+            <strong id="goldBalance">0골드</strong>
+          </div>
+          <button type="button" id="walletChargeButton">충전</button>
+        </section>
+        <section class="right-section">
+          <div class="section-title">최근 본 작품</div>
+          <div class="right-work-list" id="recentList"></div>
+        </section>
+        <section class="right-section">
+          <div class="section-title">최근 연재된 내 선호 작품</div>
+          <div class="right-work-list" id="favoriteUpdateList"></div>
+        </section>
+      </aside>
+    </div>
+
+    <nav class="mobile-bottom-nav" aria-label="모바일 메뉴">
+      <a class="nav-item active" href="./phase2_alpha_front_home.html"><span class="icon">⌂</span><span>홈</span></a>
+      <button class="nav-item" type="button" data-filter="paid"><span class="icon">◇</span><span>베스트</span></button>
+      <a class="nav-item" href="./phase7_gold_shop_charge.html"><span class="icon">☻</span><span>상점</span></a>
+      <a class="nav-item" href="./phase6_myhome_library.html"><span class="icon">▤</span><span>보관함</span></a>
+      <button class="nav-item" type="button" id="mobileMyMenu"><span class="nav-profile-circle"></span><span>마이 메뉴</span></button>
+    </nav>
 
     <div class="toast" id="toast" role="status" aria-live="polite"></div>
     <script type="module" src="./js/phase2_alpha_front_home_app.js"></script>

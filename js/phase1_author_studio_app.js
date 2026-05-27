@@ -210,7 +210,7 @@ function bindWorkActions() {
   $$("[data-action]").forEach((button) => {
     button.addEventListener("click", () => {
       const { action, workId } = button.dataset;
-      if (action === "home") showModal({ body: "작품 홈으로 갑니다." });
+      if (action === "home") location.href = `./phase3_work_home.html?workId=${encodeURIComponent(workId)}`;
       if (action === "tags") showModal({ title: button.dataset.tagsKind, body: tagPopup(button.dataset.tags) });
       if (action === "toggle-description") toggleDescription(button);
       if (action === "intro") navigate("intro", { workId });
@@ -310,8 +310,8 @@ function registerStep(step, draft) {
   if (step === 1) {
     return `<div class="choice-cards">
       ${[
-        ["general", "일반 소설 연재", "단순 텍스트 기반 연재입니다."],
-        ["interactive", "인터랙티브 소설 연재", "선택지, 씬, 아이템 문법을 사용할 수 있습니다."],
+        ["general", "일반글", "일반적인 소설 경험입니다. 단순 텍스트 기반 연재입니다."],
+        ["interactive", "갈래글", "인터렉티브 소설 경험입니다. 선택지, 씬, 아이템 문법을 사용할 수 있습니다."],
       ].map(([value, title, text]) => `<label class="choice-card ${draft.type === value ? "active" : ""}"><input class="visually-hidden" type="radio" name="type" value="${value}" ${draft.type === value ? "checked" : ""}/><strong>${title}</strong><span>${text}</span></label>`).join("")}
     </div>`;
   }
@@ -772,7 +772,7 @@ function renderItems() {
   const items = loadState().items.filter((item) => item.worldbuildingId === world.id);
   app.innerHTML =
     shell("아이템 관리", esc(world.title), `<button class="primary-btn" id="newItem">새 아이템 등록</button>`) +
-    `<p class="readonly-note">아이템은 인터랙티브 작품의 진행 상태입니다. 일반 소설에서는 세계관 자료로만 사용됩니다.</p><div class="view">${items.map(itemCard).join("")}</div><div class="step-actions"><button class="secondary-btn" id="backWorld">세계관으로 돌아가기</button></div>`;
+    `<p class="readonly-note">아이템은 갈래글 작품의 진행 상태입니다. 일반글에서는 세계관 자료로만 사용됩니다.</p><div class="view">${items.map(itemCard).join("")}</div><div class="step-actions"><button class="secondary-btn" id="backWorld">세계관으로 돌아가기</button></div>`;
   $("#newItem").addEventListener("click", () => itemForm(world.id));
   $("#backWorld").addEventListener("click", () => navigate("worlds", { worldId: world.id }));
   $$("[data-item-edit]").forEach((button) => button.addEventListener("click", () => itemForm(world.id, button.dataset.itemEdit)));
@@ -875,7 +875,7 @@ function renderEditor() {
     shell("화 작성 에디터", esc(work.title)) +
     `<form class="form-card editor-form" id="episodeForm">
       <div class="grid two"><div class="form-row"><label>화 선택</label><select id="episodeSelect"><option value="">새 화</option>${episodes.map((ep) => `<option value="${ep.id}" ${ep.id === episode.id ? "selected" : ""}>${ep.episodeNo}화 ${esc(ep.title)}</option>`)}</select></div><div class="form-row"><label>화 제목</label><input name="title" value="${esc(episode.title)}" required placeholder="예: 프롤로그, 숲의 문이 열리는 밤" /></div></div>
-      ${work.type === "interactive" ? `<div class="form-row"><label>필수 이전 홧수</label><select name="requiredPreviousEpisodeNo"><option value="">없음</option>${episodes.filter((ep) => ep.id !== episode.id).map((ep) => `<option value="${ep.episodeNo}" ${String(episode.requiredPreviousEpisodeNo) === String(ep.episodeNo) ? "selected" : ""}>${ep.episodeNo}화 ${esc(ep.title)}</option>`)}</select><p class="helper">필수 이전 홧수는 이 화를 보기 전에 반드시 지나쳐야 하는 화입니다. 없음이면 별도 진입 조건이 없습니다. 특정 분기를 지나온 독자에게만 보여주려면 그 분기 화를 선택하고, 인터랙티브 형식으로 일반 순차 연재를 하려면 바로 전 화를 선택하세요.</p></div>` : ""}
+      ${work.type === "interactive" ? `<div class="form-row"><label>필수 이전 홧수</label><select name="requiredPreviousEpisodeNo"><option value="">없음</option>${episodes.filter((ep) => ep.id !== episode.id).map((ep) => `<option value="${ep.episodeNo}" ${String(episode.requiredPreviousEpisodeNo) === String(ep.episodeNo) ? "selected" : ""}>${ep.episodeNo}화 ${esc(ep.title)}</option>`)}</select><p class="helper">필수 이전 홧수는 이 화를 보기 전에 반드시 지나쳐야 하는 화입니다. 없음이면 별도 진입 조건이 없습니다. 특정 분기를 지나온 독자에게만 보여주려면 그 분기 화를 선택하고, 갈래글 형식으로 일반 순차 연재를 하려면 바로 전 화를 선택하세요.</p></div>` : ""}
       <div class="editor-tools">${work.type === "interactive" ? `<button type="button" class="secondary-btn" data-insert="[[선택지:\\n무엇을 한다.\\n아무것도 안한다.\\n]]">선택지</button><button type="button" class="secondary-btn" data-insert="[[씬:무엇을 한다.\\n무엇을 했다.\\n]]">씬</button><button type="button" class="secondary-btn" data-insert="[[+아이템]]">+아이템</button><button type="button" class="secondary-btn" data-insert="[[엔딩:이름\\n내용\\n]]">엔딩</button>` : ""}</div>
       <div class="form-row"><label>본문</label><textarea class="manuscript" id="bodyInput" name="body" placeholder="${work.type === "interactive" ? "본문을 쓰고 [[선택지:]], [[씬:]], [[+아이템]] 문법을 사용할 수 있습니다." : "첫 문장을 적어보세요. 독자가 보는 줄폭에 가깝게 작성됩니다."}">${esc(episode.body)}</textarea></div>
       <div class="form-row"><label>작가의 말</label><textarea name="authorNote" placeholder="생략하면 작가의 말이 표시되지 않습니다.">${esc(episode.authorNote)}</textarea></div>
@@ -975,7 +975,7 @@ function queueSection(work) {
   return `<section class="queue-work">
     <div class="queue-head queue-head-rich">
       <div>
-        <h2>${esc(work.title)} <span class="badge">${isCompleted ? "완결" : isRegular ? "정기연재" : "비정기"}</span>${work.type === "interactive" ? ` <span class="badge blue">인터랙티브 소설</span>` : ""}${work.isAdult === "adult" ? ` <span class="badge danger">19금</span>` : ""}${work.isPaidWork ? ` <span class="badge warn">유료</span>` : ""}</h2>
+        <h2>${esc(work.title)} <span class="badge">${isCompleted ? "완결" : isRegular ? "정기연재" : "비정기"}</span>${work.type === "interactive" ? ` <span class="badge blue">갈래글</span>` : ""}${work.isAdult === "adult" ? ` <span class="badge danger">19금</span>` : ""}${work.isPaidWork ? ` <span class="badge warn">유료</span>` : ""}</h2>
         <div class="queue-meta"><span class="queue-meta-main">연재방식 <strong>${isRegular ? `${weekdayChipsText(work.releaseSettings.days)} ${work.releaseSettings.hour}:${work.releaseSettings.minute}` : "비정기"}</strong></span><span>공개 완료 <strong>${published}화</strong></span><span>확정 목록 <strong>${confirmed.length}개</strong></span><span class="queue-meta-soft">대기열 <strong>${queued.length}/${maxSlots}</strong></span><span class="queue-meta-soft">지원권 <strong>${work.queueSupportTickets}장</strong></span></div>
       </div>
     </div>

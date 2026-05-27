@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>숲글 로그인/회원가입</title>
+    <link rel="stylesheet" href="./css/phase2_auth_entry_view.css" />
+  </head>
+  <body>
+    <main class="auth-page">
+      <a class="back-link" href="./phase2_alpha_front_home.html">← 홈으로</a>
+      <section class="auth-panel" aria-labelledby="authTitle">
+        <p class="eyebrow">ALPHA TEST ACCOUNT</p>
+        <h1 id="authTitle">로그인 또는 회원가입</h1>
+        <p class="summary">알파테스트에서는 실제 외부 계정을 연결하지 않고 테스트계정 하나로 로그인 흐름만 확인합니다.</p>
+
+        <div class="auth-actions">
+          <button class="naver" type="button" data-auth-provider="naver">네이버 로그인</button>
+          <button class="google" type="button" data-auth-provider="google">구글 로그인</button>
+          <button class="test-signup" type="button" data-auth-provider="signup">테스트 회원가입</button>
+        </div>
+
+        <p class="note">충전과 구매는 사이트 내부 가상 골드로만 동작합니다.</p>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./js/phase2_auth_entry_app.js"></script>
+  </body>
+</html>

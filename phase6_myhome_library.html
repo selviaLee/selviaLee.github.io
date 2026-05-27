@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>숲글 마이홈</title>
+    <link rel="stylesheet" href="./css/phase6_myhome_library_view.css" />
+  </head>
+  <body>
+    <header class="myhome-header">
+      <div class="header-inner">
+        <a class="brand" href="./phase2_alpha_front_home.html">
+          <span class="brand-mark">숲</span>
+          <span>
+            <strong>마이홈</strong>
+            <small>읽는 작품, 엔딩, 작업실</small>
+          </span>
+        </a>
+        <nav aria-label="마이홈 이동">
+          <a href="./phase2_alpha_front_home.html">홈</a>
+          <a href="./author_work_list.html">작가작업실</a>
+        </nav>
+      </div>
+    </header>
+
+    <main class="page">
+      <section class="myhome-gate" id="loginGate">
+        <div>
+          <p class="eyebrow">MY HOME</p>
+          <h1>내가 읽는 작품을 정리합니다.</h1>
+          <p>테스트계정으로 로그인하면 읽는 작품 목록, 개인 카테고리, 엔딩 모음, 작가작업실 이동을 확인할 수 있습니다.</p>
+        </div>
+        <button type="button" id="testLogin">테스트계정 로그인</button>
+      </section>
+
+      <section class="myhome-shell hidden" id="myhomeShell">
+        <section class="summary-band" aria-label="마이홈 요약">
+          <div>
+            <p class="eyebrow">TEST ACCOUNT</p>
+            <h1 id="myhomeUserName">테스트계정</h1>
+            <p>읽던 작품을 개인 카테고리로 정리하고, 갈래글 엔딩을 모읍니다.</p>
+          </div>
+          <a class="studio-entry" href="./author_work_list.html">작가작업실 이동</a>
+        </section>
+
+        <nav class="section-tabs" aria-label="마이홈 구역">
+          <a href="#readingList">읽는 작품</a>
+          <a href="#categoryPanel">개인 카테고리</a>
+          <a href="#endingCollection">엔딩 모음</a>
+          <a href="./author_work_list.html">작가작업실</a>
+        </nav>
+
+        <section class="workspace-grid">
+          <article class="reading-panel" id="readingList">
+            <div class="section-head">
+              <div>
+                <p class="eyebrow">READING LIST</p>
+                <h2>읽는 작품 목록</h2>
+              </div>
+              <span id="readingCount">0개</span>
+            </div>
+            <div class="filter-row" id="categoryFilters"></div>
+            <div class="reading-list" id="readingWorks"></div>
+          </article>
+
+          <aside class="side-stack">
+            <section id="categoryPanel">
+              <div class="section-head compact">
+                <h2>개인 카테고리</h2>
+              </div>
+              <form class="category-form" id="categoryForm">
+                <input name="categoryName" maxlength="16" autocomplete="off" placeholder="예: 밤에 읽기" />
+                <button type="submit">추가</button>
+              </form>
+              <div class="category-list" id="categoryList"></div>
+            </section>
+
+            <section id="endingCollection">
+              <div class="section-head compact">
+                <h2>엔딩 모음</h2>
+              </div>
+              <div class="ending-list" id="endingList"></div>
+            </section>
+
+            <section>
+              <div class="section-head compact">
+                <h2>작가작업실</h2>
+              </div>
+              <p class="studio-note">모든 유저에게 존재하는 작가용 작업 공간입니다.</p>
+              <a class="studio-card" href="./author_work_list.html">작품 관리로 이동</a>
+            </section>
+          </aside>
+        </section>
+      </section>
+    </main>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./js/phase6_myhome_library_app.js"></script>
+  </body>
+</html>
