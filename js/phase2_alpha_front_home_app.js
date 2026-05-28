@@ -307,7 +307,7 @@ function bindEvents() {
       goAuth();
       return;
     }
-    location.href = "./phase6_myhome_library.html";
+    location.href = "./phase6_myhome_home.html";
   });
 
   $("#logoutUser")?.addEventListener("click", () => {

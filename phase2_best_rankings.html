@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>숲글:숲갈래글 (알파테스트:0.0.6)</title>
+    <link rel="stylesheet" href="./css/phase2_best_rankings_view.css" />
+  </head>
+  <body>
+    <header class="header">
+      <div class="header-left">
+        <button class="menu-button" type="button" data-empty-action="전체 메뉴" aria-label="전체 메뉴">☰</button>
+        <a class="logo" href="./phase2_alpha_front_home.html">숲글:숲갈래글 (알파테스트:0.0.6)</a>
+        <label class="search-wrap">
+          <span aria-hidden="true">⌕</span>
+          <input class="search-bar" type="search" placeholder="검색어를 입력하세요." />
+        </label>
+      </div>
+
+      <div class="header-right">
+        <a class="btn-create" href="./author_work_register.html">+ 작품생성</a>
+        <div class="icon-group" aria-label="상단 빠른 기능">
+          <button type="button" data-empty-action="선물함" aria-label="선물함">□</button>
+          <button class="notice-icon" type="button" data-empty-action="알림" aria-label="알림">♧<span>4</span></button>
+          <button type="button" data-empty-action="쪽지" aria-label="쪽지">✉</button>
+        </div>
+        <a class="profile-circle" href="./phase2_auth_entry.html?next=phase2_best_rankings.html" aria-label="로그인 또는 마이 메뉴">로그인</a>
+      </div>
+    </header>
+
+    <div class="main-container">
+      <aside class="pc-sidebar">
+        <nav class="user-shortcut-list" aria-label="홈 바로가기">
+          <a href="./phase2_alpha_front_home.html"><span>⌂</span>홈</a>
+          <a id="paidBestShortcut" href="./phase2_best_rankings.html?tab=paid"><span>◆</span>유료 베스트</a>
+          <a id="freeBestShortcut" href="./phase2_best_rankings.html?tab=free"><span>◇</span>무료 베스트</a>
+          <a href="./phase7_gold_shop_charge.html"><span>▣</span>상점</a>
+          <a href="./phase6_myhome_home.html"><span>▤</span>보관함</a>
+          <a href="./phase6_myhome_home.html"><span>▥</span>마이홈</a>
+          <a href="./author_work_list.html"><span>▧</span>작가작업실</a>
+        </nav>
+      </aside>
+
+      <main class="content-area">
+        <section class="best-head" aria-labelledby="bestTitle">
+          <p>BEST RANKING</p>
+          <h1 id="bestTitle">베스트</h1>
+          <span>작품 제목을 누르면 작품홈으로 이동합니다.</span>
+        </section>
+
+        <nav class="best-tabs" aria-label="베스트 메뉴">
+          <button type="button" data-best-tab="paid">유료 베스트</button>
+          <button type="button" data-best-tab="free">무료 베스트</button>
+        </nav>
+
+        <section class="ranking-list" id="rankingList" aria-label="베스트 작품 목록"></section>
+      </main>
+    </div>
+
+    <nav class="mobile-bottom-nav" aria-label="모바일 메뉴">
+      <a class="nav-item" href="./phase2_alpha_front_home.html"><span class="icon">⌂</span><span>홈</span></a>
+      <a class="nav-item active" href="./phase2_best_rankings.html?tab=paid"><span class="icon">◇</span><span>베스트</span></a>
+      <a class="nav-item" href="./phase7_gold_shop_charge.html"><span class="icon">▣</span><span>상점</span></a>
+      <a class="nav-item" href="./phase6_myhome_home.html"><span class="icon">▤</span><span>보관함</span></a>
+      <a class="nav-item" href="./phase2_auth_entry.html?next=phase2_best_rankings.html"><span class="nav-profile-circle"></span><span>마이 메뉴</span></a>
+    </nav>
+
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
+    <script type="module" src="./js/phase2_best_rankings_app.js"></script>
+  </body>
+</html>

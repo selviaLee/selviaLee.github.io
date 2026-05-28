@@ -235,6 +235,16 @@ function latestReview(work) {
     .sort((a, b) => new Date(b.createdAt || b.updatedAt || 0) - new Date(a.createdAt || a.updatedAt || 0))[0] || null;
 }
 
+function iconSvg(name) {
+  const icons = {
+    alpha: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3Z"/><path d="M8 14.5 11.6 8h.9l3.5 6.5"/><path d="M9.4 12.4h5.2"/></svg>`,
+    notice: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>`,
+    review: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H8l-3 3z"/><path d="M8 9h8"/><path d="M8 12h5"/></svg>`,
+    bookmark: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.2L7 20z"/></svg>`,
+  };
+  return icons[name] || icons.alpha;
+}
+
 function renderHero(data, work) {
   const tags = work.normalTags || [];
   return `<strong class="mobile-work-title">${esc(work.title)}</strong>
@@ -252,7 +262,6 @@ function renderHero(data, work) {
     ${renderReleaseSchedule(work)}
     <h1>${esc(work.title)}</h1>
     <p class="author">${esc(authorName(data, work))}</p>
-    <button class="favorite-button" type="button" data-favorite>선호작품</button>
     <div class="stat-row" aria-label="작품 통계">
       <span>조회 ${compactNumber(work.views)}</span>
       <span>선호 ${compactNumber(work.favorites)}</span>
@@ -263,16 +272,102 @@ function renderHero(data, work) {
       <p>${esc(work.description || "작품 소개가 없습니다.")}</p>
       <button type="button" data-description-toggle>더보기</button>
     </div>
-    <button class="promo-row" type="button" data-empty><span>▢</span><strong>[알파테스트]</strong><em>충전 골드로 구매 흐름을 테스트할 수 있습니다.</em><b>›</b></button>
+    <button class="promo-row alpha-row" type="button" data-empty><span>${iconSvg("alpha")}</span><strong>알파테스트</strong><em>충전 골드로 구매 흐름을 테스트할 수 있습니다.</em><b>›</b></button>
+    <button class="favorite-button" type="button" data-favorite><span>${iconSvg("bookmark")}</span><strong>선호작품</strong></button>
   </section>`;
 }
 
 function renderNoticeAndReview(data, work) {
   const notice = latestManualNotice(data, work);
   const review = latestReview(work);
-  const rows = `${notice ? `<button class="promo-row" type="button" data-empty><span>▢</span><strong>공지</strong><em>${esc(notice.title || notice.body || "공지")}</em><b>›</b></button>` : ""}
-    ${review ? `<button class="promo-row" type="button" data-review-more><span>▢</span><strong>최신 리뷰</strong><em>${esc(review.body || "리뷰")}</em><b>›</b></button>` : ""}`;
+  const noticeDate = notice ? formatDate(notice.updatedAt || notice.createdAt || notice.linkedAt) : "";
+  const rows = `${notice ? `<button class="promo-row notice-summary-row" type="button" data-empty><span>${iconSvg("notice")}</span><strong>공지</strong><em><span class="notice-title-text">${esc(notice.title || "공지")}</span>${noticeDate ? `<time>${noticeDate}</time>` : ""}</em><b>›</b></button>` : ""}
+    ${review ? `<button class="promo-row" type="button" data-review-more><span>${iconSvg("review")}</span><strong>최신 리뷰</strong><em>${esc(review.body || "리뷰")}</em><b>›</b></button>` : ""}`;
   return rows.trim() ? `<section class="summary-links">${rows}</section>` : "";
+}
+
+function renderMobileInfoPanel(work) {
+  return `<section class="tab-panel info-tab-panel">
+    <div class="info-card">
+      <h2>줄거리</h2>
+      <div class="description-box expanded mobile-info-description">
+        <p>${esc(work.description || "작품 소개가 없습니다.")}</p>
+      </div>
+    </div>
+    <div class="info-card">
+      <h2>태그</h2>
+      <div class="tag-strip">${tagList(work.normalTags || [], Boolean(work.sensitiveTags?.length))}</div>
+    </div>
+    <div class="info-card">
+      <h2>작품 정보</h2>
+      <dl class="work-info-list">
+        <div><dt>유형</dt><dd>${typeText(work.type)}</dd></div>
+        <div><dt>장르</dt><dd>${esc(work.genre1 || "기타")} · ${esc(work.genre2 || "기타")}</dd></div>
+        <div><dt>연재</dt><dd>${releaseSchedule(work).method === "regular" ? "정기연재" : "비정기연재"}</dd></div>
+        <div><dt>이용</dt><dd>${work.isPaidWork ? "유료 작품" : "무료 작품"}</dd></div>
+      </dl>
+    </div>
+  </section>`;
+}
+
+function noticeRows(data, work) {
+  const manual = latestManualNotice(data, work);
+  const schedule = releaseSchedule(work);
+  const autoScheduleNotice = {
+    title: schedule.method === "regular" ? "연재일 안내" : "비정기 연재 안내",
+    date: new Date().toISOString(),
+    body: schedule.method === "regular" ? `정기 연재 일정은 ${schedule.selectedDays.join(", ") || "요일 미정"} ${schedule.time}입니다.` : "이 작품은 비정기 연재 작품입니다.",
+    auto: true,
+  };
+  return [manual, autoScheduleNotice].filter(Boolean);
+}
+
+function renderNewsPanel(data, work) {
+  const rows = noticeRows(data, work)
+    .map(
+      (notice) => `<article class="notice-card">
+        <div>
+          <span>${notice.auto ? "자동" : "안내"}</span>
+          <strong>${esc(notice.title || "공지")}</strong>
+        </div>
+        <time>${formatDate(notice.updatedAt || notice.createdAt || notice.date)}</time>
+      </article>`,
+    )
+    .join("");
+  return `<section class="tab-panel news-tab-panel">${rows || `<div class="empty">등록된 소식이 없습니다.</div>`}</section>`;
+}
+
+function visibleCommentItems(work) {
+  const reviews = (Array.isArray(work.reviews) ? work.reviews : []).map((item) => ({ ...item, kind: item.episodeId ? "comment" : "review" }));
+  const fallback = [
+    { id: "review_sample", kind: "review", author: "테스트독자", body: "작품 분위기가 좋아서 다음 회차가 궁금합니다.", createdAt: new Date().toISOString(), spoiler: false },
+    { id: "comment_sample", kind: "comment", author: "회차독자", body: "첫 화의 선택지가 인상적이었습니다.", createdAt: new Date().toISOString(), spoiler: false },
+  ];
+  return (reviews.length ? reviews : fallback)
+    .filter((item) => !item.spoiler && !item.isSpoiler && item.visible !== false)
+    .sort((a, b) => new Date(b.createdAt || b.updatedAt || 0) - new Date(a.createdAt || a.updatedAt || 0));
+}
+
+function renderCommentsPanel(work) {
+  const rows = visibleCommentItems(work)
+    .map(
+      (item) => `<article class="comment-card">
+        <div class="comment-avatar" aria-hidden="true"></div>
+        <div>
+          <div class="comment-head">
+            <strong>${esc(item.author || "독자")}</strong>
+            <span>${item.kind === "review" ? "리뷰" : "댓글"}</span>
+            <time>${formatDate(item.createdAt || item.updatedAt)}</time>
+          </div>
+          <p>${esc(item.body || item.content || "내용이 없습니다.")}</p>
+        </div>
+      </article>`,
+    )
+    .join("");
+  return `<section class="tab-panel comments-tab-panel">
+    <div class="comment-tools"><strong>전체 ${compactNumber(rows ? visibleCommentItems(work).length : 0)}</strong><span>볼 수 있는 댓글/리뷰만 표시</span></div>
+    ${rows || `<div class="empty">표시할 댓글/리뷰가 없습니다.</div>`}
+  </section>`;
 }
 
 function renderReadCta() {
@@ -298,9 +393,10 @@ function renderSensitivePopup(work) {
 
 function renderTabs(data, work) {
   return `<nav class="content-tabs" aria-label="작품 내용">
-    <button type="button" class="${activeTab === "chapters" ? "active" : ""}" data-tab="chapters">연재 목록</button>
-    <button type="button" class="${activeTab === "author" ? "active" : ""}" data-tab="author">${usesOfficialName(work) ? "작가의 다른작품" : "맞춤추천"}</button>
-    <button type="button" class="${activeTab === "recommend" ? "active" : ""}" data-tab="recommend">맞춤추천</button>
+    <button type="button" class="${activeTab === "chapters" ? "active" : ""}" data-tab="chapters">회차</button>
+    <button type="button" class="${activeTab === "info" ? "active" : ""}" data-tab="info">정보</button>
+    <button type="button" class="${activeTab === "news" ? "active" : ""}" data-tab="news">소식</button>
+    <button type="button" class="${activeTab === "comments" ? "active" : ""}" data-tab="comments">댓글</button>
   </nav>`;
 }
 
@@ -378,12 +474,14 @@ function renderRecommendations(data, work, compact = false) {
 }
 
 function renderActiveTab(data, work, episodes) {
-  if (activeTab === "author") return renderAuthorWorks(data, work);
-  if (activeTab === "recommend") return renderRecommendations(data, work);
+  if (activeTab === "info") return renderMobileInfoPanel(work);
+  if (activeTab === "news") return renderNewsPanel(data, work);
+  if (activeTab === "comments") return renderCommentsPanel(work);
   return renderChapters(work, episodes);
 }
 
 function renderRails(data) {
+  if (!$("#recentList") || !$("#favoriteUpdateList")) return;
   const works = data.works || [];
   const recent = works.slice(0, 3);
   const favoriteUpdates = works.filter((work) => work.status !== "completed").slice(0, 3);
