@@ -4,29 +4,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>숲글:숲갈래글 (알파테스트:0.0.6)</title>
-    <link rel="stylesheet" href="./css/phase7_gold_shop_charge_view.css" />
-    <link rel="stylesheet" href="./css/home_app_shell.css" />
+    <link rel="stylesheet" href="./css/phase7_gold_shop_charge_view.css?v=0.0.16" />
+    <link rel="stylesheet" href="./css/home_app_shell.css?v=0.0.18" />
   </head>
   <body data-shell-page="shop" data-shell-right="none">
     <div data-shell-content>
       <section class="shop-head" aria-labelledby="shopTitle">
         <div>
-          <p>ALPHA TEST SHOP</p>
-          <h1 id="shopTitle">상점</h1>
-          <span>알파테스트에서는 실제 결제 없이 선택한 상품을 바로 테스트 계정에 반영합니다.</span>
+          <p>ALPHA TEST FOREST SHOP</p>
+          <h1 id="shopTitle">숲상점</h1>
+          <span>알파테스트에서는 실제 결제 없이 선택한 숲결 상품을 바로 테스트 계정에 반영합니다.</span>
         </div>
-        <strong id="shopGoldBalance">0골드</strong>
+        <strong id="shopGoldBalance">0숲결</strong>
       </section>
 
-      <nav class="shop-tabs" aria-label="상점 메뉴">
-        <button class="active" type="button" data-shop-tab="gold">골드</button>
+      <nav class="shop-tabs" aria-label="숲상점 메뉴">
+        <button class="active" type="button" data-shop-tab="gold">숲결</button>
         <button type="button" data-shop-tab="author">작가티켓</button>
         <button type="button" data-shop-tab="user">유저티켓</button>
         <button type="button" data-shop-tab="world">세계관</button>
       </nav>
 
       <section class="shop-body">
-        <div class="product-grid" id="productGrid" aria-label="상점 상품"></div>
+        <div class="product-grid" id="productGrid" aria-label="숲상점 상품"></div>
 
         <aside class="checkout-box" id="checkoutBox" aria-label="충전 확인">
           <div>
@@ -37,12 +37,12 @@
             <span>결제 금액</span>
             <strong id="selectedProductPrice">0원</strong>
           </div>
-          <button type="button" id="chargeSelectedProduct">충전하기</button>
+          <button type="button" id="chargeSelectedProduct">숲결 충전</button>
         </aside>
       </section>
     </div>
 
-    <script type="module" src="./js/home_app_shell.js"></script>
-    <script type="module" src="./js/phase7_gold_shop_charge_app.js"></script>
+    <script type="module" src="./js/home_app_shell.js?v=0.0.18"></script>
+    <script type="module" src="./js/phase7_gold_shop_charge_app.js?v=0.0.17"></script>
   </body>
 </html>

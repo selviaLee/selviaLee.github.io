@@ -14,21 +14,22 @@ function writeShellSession(session) {
 
 function shellIcon(name) {
   const icons = {
-    menu: `<svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`,
-    home: `<svg viewBox="0 0 24 24"><path d="m4 11 8-7 8 7"/><path d="M6.5 10.5V20h11v-9.5"/></svg>`,
-    paid: `<svg viewBox="0 0 24 24"><path d="M12 3 5 21h14z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>`,
-    free: `<svg viewBox="0 0 24 24"><path d="m5 19 14-14"/><path d="M7 5h5v5"/><path d="M12 14h5v5"/></svg>`,
-    shop: `<svg viewBox="0 0 24 24"><path d="M5 9h14l-1 11H6z"/><path d="M8 9V6a4 4 0 0 1 8 0v3"/></svg>`,
-    library: `<svg viewBox="0 0 24 24"><path d="M5 5h14v15H5z"/><path d="M8 9h8"/><path d="M8 13h8"/></svg>`,
-    tag: `<svg viewBox="0 0 24 24"><path d="M4 5v6.5L13.5 21 21 13.5 11.5 4H5a1 1 0 0 0-1 1Z"/><circle cx="8.5" cy="8.5" r="1.2"/></svg>`,
-    ending: `<svg viewBox="0 0 24 24"><path d="M7 4h10v6a5 5 0 0 1-10 0z"/><path d="M5 6H3v2a4 4 0 0 0 4 4"/><path d="M19 6h2v2a4 4 0 0 1-4 4"/><path d="M12 15v4"/><path d="M8 21h8"/></svg>`,
-    studio: `<svg viewBox="0 0 24 24"><path d="M5 4h14v16H5z"/><path d="M8 8h8"/><path d="M8 12h5"/></svg>`,
-    gift: `<svg viewBox="0 0 24 24"><path d="M4 10h16v10H4z"/><path d="M3 6h18v4H3z"/><path d="M12 6v14"/><path d="M12 6c-2-3-6-2.5-5 0 1 2 5 0 5 0Z"/><path d="M12 6c2-3 6-2.5 5 0-1 2-5 0-5 0Z"/></svg>`,
-    bell: `<svg viewBox="0 0 24 24"><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg>`,
-    mail: `<svg viewBox="0 0 24 24"><path d="M4 6h16v12H4z"/><path d="m4 7 8 6 8-6"/></svg>`,
-    search: `<svg viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4 4"/></svg>`,
+    menu: "menu_branch.svg",
+    home: "home_grove.svg",
+    paid: "paid_seed.svg",
+    free: "free_sprout.svg",
+    shop: "shop_basket_leaf.svg",
+    library: "book_leaf.svg",
+    tag: "tag_leaf.svg",
+    ending: "ending_branch.svg",
+    studio: "studio_quill_leaf.svg",
+    gift: "gift_acorn.svg",
+    bell: "bell_flower.svg",
+    mail: "mail_bark.svg",
+    search: "search_leaf.svg",
   };
-  return icons[name] || icons.home;
+  const fileName = icons[name] || icons.home;
+  return `<img class="shell-icon-img" src="./assets/icons/forest/${fileName}" alt="" aria-hidden="true" />`;
 }
 
 function navItem(href, icon, label, page, activePage) {
@@ -44,8 +45,8 @@ function renderMyhomeSidebar() {
       <a class="myhome-sub" href="#endings" data-myhome-route="endings"><span>${shellIcon("ending")}</span>엔딩 모음</a>
       <a class="myhome-studio-link" href="./author_work_list.html"><span>${shellIcon("studio")}</span>작가작업실 이동</a>
     </nav>
-    <button class="left-extension-card" type="button" data-empty-action="테스트 골드 안내">
-      <strong>테스트 골드</strong>
+    <button class="left-extension-card" type="button" data-empty-action="테스트 숲결 안내">
+      <strong>테스트 숲결</strong>
       <span>가상 재화로 구매 흐름 확인</span>
     </button>
   </aside>`;
@@ -56,15 +57,16 @@ function renderSidebar(page, navMode) {
   return `<aside class="pc-sidebar">
     <nav class="user-shortcut-list" aria-label="홈 바로가기">
       ${navItem("./phase2_alpha_front_home.html", "home", "홈", "home", page)}
-      ${navItem("./phase2_best_rankings.html?tab=paid", "paid", "유료 베스트", "paidBest", page)}
-      ${navItem("./phase2_best_rankings.html?tab=free", "free", "무료 베스트", "freeBest", page)}
-      ${navItem("./phase7_gold_shop_charge.html", "shop", "상점", "shop", page)}
+      <a id="paidBestShortcut" class="${page === "paidBest" ? "active" : ""}" href="./phase2_best_rankings.html?tab=paid"><span>${shellIcon("paid")}</span>유료 베스트</a>
+      <a id="freeBestShortcut" class="${page === "freeBest" ? "active" : ""}" href="./phase2_best_rankings.html?tab=free"><span>${shellIcon("free")}</span>무료 베스트</a>
+      ${navItem("./phase7_gold_shop_charge.html", "shop", "숲상점", "shop", page)}
+      <span class="nav-divider" aria-hidden="true"></span>
       ${navItem("./phase6_myhome_home.html", "library", "보관함", "library", page)}
       ${navItem("./phase6_myhome_home.html", "library", "마이홈", "myhome", page)}
       ${navItem("./author_work_list.html", "studio", "작가작업실", "studio", page)}
     </nav>
     <button class="left-extension-card" type="button" data-empty-action="왼쪽 확장 슬롯">
-      <strong>테스트 골드</strong>
+      <strong>테스트 숲결</strong>
       <span>가상 재화로 구매 흐름 확인</span>
     </button>
   </aside>`;
@@ -73,10 +75,10 @@ function renderSidebar(page, navMode) {
 function renderRightbar(mode) {
   if (mode !== "home") return "";
   return `<aside class="pc-rightbar" aria-label="개인 목록">
-    <section class="wallet-card" id="walletCard" aria-label="보유 골드">
+    <section class="wallet-card" id="walletCard" aria-label="보유 숲결">
       <div class="wallet-info">
         <span id="walletUserName">로그인이 필요합니다</span>
-        <strong id="goldBalance">0골드</strong>
+        <strong id="goldBalance">0숲결</strong>
       </div>
       <button type="button" id="walletChargeButton">충전</button>
     </section>
@@ -124,7 +126,7 @@ function shellTemplate({ page, rightMode, navMode }) {
   <nav class="mobile-bottom-nav" aria-label="모바일 메뉴">
     <a class="nav-item ${page === "home" ? "active" : ""}" href="./phase2_alpha_front_home.html"><span class="icon">${shellIcon("home")}</span><span>홈</span></a>
     <a class="nav-item ${page === "paidBest" || page === "freeBest" ? "active" : ""}" href="./phase2_best_rankings.html?tab=paid"><span class="icon">${shellIcon("paid")}</span><span>베스트</span></a>
-    <a class="nav-item ${page === "shop" ? "active" : ""}" href="./phase7_gold_shop_charge.html"><span class="icon">${shellIcon("shop")}</span><span>상점</span></a>
+    <a class="nav-item ${page === "shop" ? "active" : ""}" href="./phase7_gold_shop_charge.html"><span class="icon">${shellIcon("shop")}</span><span>숲상점</span></a>
     <a class="nav-item ${page === "library" || page === "myhome" ? "active" : ""}" href="./phase6_myhome_home.html"><span class="icon">${shellIcon("library")}</span><span>보관함</span></a>
     <button class="nav-item" type="button" id="mobileMyMenu"><span class="nav-profile-circle"></span><span>마이 메뉴</span></button>
   </nav>
@@ -144,7 +146,7 @@ function updateShellAccount() {
   document.querySelector("#createWorkButton")?.classList.toggle("hidden", !loggedIn);
   document.querySelector("#walletCard")?.classList.toggle("is-ghost", !loggedIn);
   if (document.querySelector("#walletUserName")) document.querySelector("#walletUserName").textContent = session.user?.name || "테스트계정";
-  if (document.querySelector("#goldBalance")) document.querySelector("#goldBalance").textContent = `${Number(session.gold || 0).toLocaleString("ko-KR")}골드`;
+  if (document.querySelector("#goldBalance")) document.querySelector("#goldBalance").textContent = `${Number(session.gold || 0).toLocaleString("ko-KR")}숲결`;
 }
 
 function authNextPath() {

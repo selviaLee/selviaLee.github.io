@@ -1293,7 +1293,7 @@ function askExpandQueue(workId) {
     });
     return;
   }
-  showModal({ title: "상점", body: "보유 중인 대기열 추가권이 부족합니다. 상점으로 이동합니다. 지금은 mock입니다." });
+  showModal({ title: "숲상점", body: "보유 중인 대기열 추가권이 부족합니다. 숲상점으로 이동합니다. 지금은 mock입니다." });
 }
 
 function consumeQueueTicket(workId, type) {
@@ -1475,15 +1475,15 @@ function renderSettings() {
       <section class="settings-block"><h2>임시닉네임 상태</h2><div class="temporary-name-list">${tempWorks.length ? tempWorks.map((work) => `<div class="temporary-name-row"><div><strong>${esc(work.temporaryAuthorNickname)}</strong><span>${esc(work.title)}</span></div><button type="button" class="secondary-btn" data-reset-temp="${work.id}">본 닉네임으로 변경</button><button type="button" class="secondary-btn" data-temp-shop>변경권 충전</button></div>`).join("") : `<p class="helper">사용 중인 임시닉네임이 없습니다.</p>`}</div></section>
       <section class="settings-block"><h2>내가 보는 장르 표시</h2><p class="helper">작품 등록 기본값으로 사용하지 않는 독자 선호 표시입니다.</p><div class="genre-display-row"><div class="form-row"><label>장르 표시 1</label><select name="readerGenreDisplay1">${genre1Options.map((x) => `<option ${state.authorProfile.readerGenreDisplay1 === x ? "selected" : ""}>${x}</option>`)}</select></div><div class="form-row"><label>장르 표시 2</label><select name="readerGenreDisplay2">${genre2Options.map((x) => `<option ${state.authorProfile.readerGenreDisplay2 === x ? "selected" : ""}>${x}</option>`)}</select></div></div></section>
       <section class="settings-block compact-status"><h2>성인인증 상태</h2><span class="badge">${adultLabels[state.authorProfile.adultVerificationStatus] || "인증 안 됨"}</span></section>
-      <section class="settings-block shop-line"><h2>상점</h2><p class="helper">닉네임 변경권 구매는 상점에서 진행합니다.</p><button type="button" class="secondary-btn" id="shopButton">상점 이동</button></section>
+      <section class="settings-block shop-line"><h2>숲상점</h2><p class="helper">닉네임 변경권 구매는 숲상점에서 진행합니다.</p><button type="button" class="secondary-btn" id="shopButton">숲상점 이동</button></section>
       <div class="step-actions"><button class="primary-btn">설정 저장</button><button type="button" class="secondary-btn" id="cancelSettings">취소</button><button type="button" class="secondary-btn" id="backWorks">내 작품 목록으로 돌아가기</button></div>
     </form>`;
   $("#editOfficial").addEventListener("click", handleOfficialNicknameButton);
-  $("#shopButton").addEventListener("click", () => showModal({ title: "상점", body: "상점페이지로 이동합니다. 지금은 mock입니다." }));
+  $("#shopButton").addEventListener("click", () => showModal({ title: "숲상점", body: "숲상점 페이지로 이동합니다. 지금은 mock입니다." }));
   $("#cancelSettings").addEventListener("click", () => renderSettings());
   $("#backWorks").addEventListener("click", () => navigate("dashboard"));
   $$("[data-reset-temp]").forEach((button) => button.addEventListener("click", () => resetTempName(button.dataset.resetTemp)));
-  $$("[data-temp-shop]").forEach((button) => button.addEventListener("click", () => showModal({ title: "상점", body: "임시닉네임 변경권 충전 화면으로 이동합니다. 지금은 mock입니다." })));
+  $$("[data-temp-shop]").forEach((button) => button.addEventListener("click", () => showModal({ title: "숲상점", body: "임시닉네임 변경권 충전 화면으로 이동합니다. 지금은 mock입니다." })));
   preventEnterSubmit($("#settingsForm"));
   $("#settingsForm").addEventListener("submit", (event) => {
     event.preventDefault();
@@ -1508,7 +1508,7 @@ function askOfficialNickname() {
     actions: [
       { label: "변경", kind: "primary", onClick: () => enableNicknameEdit() },
       { label: "취소", kind: "secondary" },
-      { label: "상점", kind: "secondary", onClick: () => showModal({ title: "상점", body: "상점페이지로 이동합니다. 지금은 mock입니다." }) },
+      { label: "숲상점", kind: "secondary", onClick: () => showModal({ title: "숲상점", body: "숲상점 페이지로 이동합니다. 지금은 mock입니다." }) },
     ],
   });
 }
@@ -1523,7 +1523,7 @@ function enableNicknameEdit() {
   const input = $("#officialNameInput");
   const button = $("#editOfficial");
   if (currentUser().officialNicknameChangeTickets <= 0) {
-    showModal({ body: "변경권이 없습니다. 상점에서 충전해주세요." });
+    showModal({ body: "변경권이 없습니다. 숲상점에서 충전해주세요." });
     return;
   }
   input.disabled = false;

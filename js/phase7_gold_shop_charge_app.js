@@ -2,22 +2,28 @@ const SESSION_KEY = "supgeul_phase2_alpha_session";
 
 const products = {
   gold: [
-    { id: "gold_5000", gold: 5000, price: 5000, description: "가볍게 구매 흐름을 확인하는 기본 충전" },
-    { id: "gold_15000", gold: 15000, price: 15000, description: "여러 작품 구매 테스트에 맞춘 충전" },
-    { id: "gold_30000", gold: 30000, price: 30000, description: "연속 구매와 후원 흐름 확인용 충전" },
-    { id: "gold_50000", gold: 50000, price: 50000, description: "대량 테스트용 골드 충전" },
+    { id: "forest_seed_100", name: "씨앗 꾸러미", icon: "씨", gold: 100, price: 100, description: "가볍게 구매 흐름을 확인하는 작은 숲결 묶음" },
+    { id: "forest_sprout_1000", name: "새싹 꾸러미", icon: "싹", gold: 1000, price: 1000, description: "몇 편의 작품 구매 테스트에 맞춘 숲결 묶음" },
+    { id: "forest_tree_10000", name: "나무 꾸러미", icon: "나", gold: 10000, price: 10000, description: "연속 구매와 후원 흐름 확인용 숲결 묶음" },
+    { id: "forest_grove_50000", name: "숲 꾸러미", icon: "숲", gold: 50000, price: 50000, description: "대량 테스트용 숲결 묶음" },
   ],
   author: [
-    { id: "queue_ticket", name: "대기열 추가권", price: 1200, description: "작품 대기열을 1칸 늘리는 작가용 티켓" },
-    { id: "nickname_ticket", name: "닉네임 변경권", price: 500, description: "작가 닉네임 추가 변경 mock 티켓" },
+    { id: "queue_ticket", name: "대기열 추가권", icon: "열", price: 1200, description: "작품 대기열을 1칸 늘리는 작가용 티켓" },
+    { id: "nickname_ticket", name: "닉네임 변경권", icon: "닉", price: 500, description: "작가 닉네임 추가 변경 mock 티켓" },
+    { id: "notice_pin_ticket", name: "공지 강조권", icon: "공", price: 300, description: "작가 공지를 일정 기간 더 잘 보이게 하는 후보 상품" },
+    { id: "draft_slot_ticket", name: "원고 보관 확장권", icon: "원", price: 900, description: "작가 작업실 원고 보관 슬롯을 늘리는 후보 상품" },
   ],
   user: [
-    { id: "save_slot_ticket", name: "저장 슬롯 추가권", price: 700, description: "갈래글 진행 저장 슬롯을 늘리는 유저용 티켓" },
-    { id: "scene_keep_ticket", name: "장면 소장권", price: 100, description: "갈래글 장면 소장 흐름 테스트 티켓" },
+    { id: "save_slot_ticket", name: "저장 슬롯 추가권", icon: "저", price: 700, description: "갈래글 진행 저장 슬롯을 늘리는 유저용 티켓" },
+    { id: "scene_keep_ticket", name: "장면 소장권", icon: "장", price: 100, description: "갈래글 장면 소장 흐름 테스트 티켓" },
+    { id: "ending_archive_ticket", name: "엔딩 기록 확장권", icon: "끝", price: 600, description: "엔딩 모음 보관 수를 늘리는 후보 상품" },
+    { id: "reading_folder_ticket", name: "읽기 카테고리 확장권", icon: "분", price: 400, description: "읽는 작품 개인 카테고리 후보 확장 상품" },
   ],
   world: [
-    { id: "world_import_ticket", name: "세계관 가져오기권", price: 0, description: "무료 세계관 가져오기 흐름을 확인하는 mock 상품" },
-    { id: "world_slot_ticket", name: "세계관 보관 확장권", price: 900, description: "세계관 보관 확장 후보 상품" },
+    { id: "world_import_ticket", name: "세계관 가져오기권", icon: "계", price: 0, description: "무료 세계관 가져오기 흐름을 확인하는 mock 상품" },
+    { id: "world_slot_ticket", name: "세계관 보관 확장권", icon: "관", price: 900, description: "세계관 보관 확장 후보 상품" },
+    { id: "world_publish_slot", name: "세계관 배포 슬롯", icon: "배", price: 1500, description: "무료 세계관 배포 슬롯을 늘리는 후보 상품" },
+    { id: "source_lineage_badge", name: "출처 계보 강조권", icon: "출", price: 300, description: "상속 세계관 출처 계보 표시를 강조하는 후보 상품" },
   ],
 };
 
@@ -27,6 +33,10 @@ let toastTimer = null;
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => [...document.querySelectorAll(selector)];
+
+function esc(value = "") {
+  return String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#039;" }[char]));
+}
 
 function readSession() {
   try {
@@ -65,16 +75,17 @@ function ensureLogin() {
 
 function renderBalance() {
   const session = readSession();
-  $("#shopGoldBalance").textContent = `${formatNumber(session.gold)}골드`;
+  $("#shopGoldBalance").textContent = `${formatNumber(session.gold)}숲결`;
 }
 
 function renderGoldProducts() {
   return products.gold
     .map(
       (product) => `<button class="gold-product-card ${product.id === selectedProductId ? "selected" : ""}" type="button" data-product-id="${product.id}">
-        <span class="gold-icon">G</span>
-        <strong>${formatNumber(product.gold)}골드</strong>
-        <p>${product.description}</p>
+        <span class="gold-icon">${esc(product.icon || product.name.slice(0, 1))}</span>
+        <strong>${esc(product.name)}</strong>
+        <em>${formatNumber(product.gold)}숲결</em>
+        <p>${esc(product.description)}</p>
         <b>${formatNumber(product.price)}원</b>
       </button>`,
     )
@@ -84,10 +95,10 @@ function renderGoldProducts() {
 function renderPlaceholderProducts(tab) {
   return products[tab]
     .map(
-      (product) => `<button class="gold-product-card placeholder" type="button" data-empty-action="${product.name}">
-        <span class="gold-icon">T</span>
-        <strong>${product.name}</strong>
-        <p>${product.description}</p>
+      (product) => `<button class="gold-product-card placeholder" type="button" data-empty-action="${esc(product.name)}">
+        <span class="gold-icon">${esc(product.icon || product.name.slice(0, 1))}</span>
+        <strong>${esc(product.name)}</strong>
+        <p>${esc(product.description)}</p>
         <b>${formatNumber(product.price)}원</b>
       </button>`,
     )
@@ -103,7 +114,7 @@ function renderCheckout() {
   $("#checkoutBox").classList.toggle("hidden", !isGold);
   if (!isGold) return;
   const product = selectedProduct();
-  $("#selectedProductName").textContent = `${formatNumber(product.gold)}골드`;
+  $("#selectedProductName").textContent = `${product.name} · ${formatNumber(product.gold)}숲결`;
   $("#selectedProductPrice").textContent = `${formatNumber(product.price)}원`;
 }
 
@@ -125,7 +136,7 @@ function chargeSelectedProduct() {
   session.gold = Number(session.gold || 0) + product.gold;
   writeSession(session);
   renderBalance();
-  showToast(`${formatNumber(product.gold)}골드가 충전되었습니다.`);
+  showToast(`${formatNumber(product.gold)}숲결이 충전되었습니다.`);
   setTimeout(() => {
     location.href = "./phase2_alpha_front_home.html";
   }, 700);
@@ -156,7 +167,6 @@ function bindEvents() {
 }
 
 function boot() {
-  ensureLogin();
   render();
   bindEvents();
 }

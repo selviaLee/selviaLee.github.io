@@ -18,6 +18,7 @@ const alphaWorks = [
     views: 0,
     favorites: 0,
     releaseSettings: { method: "irregular", days: [], hour: "18", minute: "00" },
+    cover: { mode: "color", color: "#47645e", showTitle: true },
   },
   {
     id: "sample_test_work",
@@ -31,6 +32,7 @@ const alphaWorks = [
     views: 0,
     favorites: 0,
     releaseSettings: { method: "regular", days: ["수"], hour: "12", minute: "00" },
+    cover: { mode: "color", color: "#2f6f50", showTitle: true },
   },
 ];
 
@@ -47,6 +49,30 @@ const defaultMyhomeState = {
       title: "초록 문을 연 결말",
       reachedAt: "2026-05-28T00:00:00.000Z",
       routeSummary: "첫 선택지에서 문을 열고 숲 안쪽으로 들어갔습니다.",
+      choiceName: "초록 문을 연다",
+      items: ["숲의 열쇠", "낡은 지도"],
+      collected: true,
+    },
+    {
+      id: "ending_river_lamp",
+      workId: "sample_test_work",
+      workTitle: "테스트 작품",
+      title: "강가의 등불",
+      reachedAt: "2026-05-29T00:00:00.000Z",
+      routeSummary: "등불을 따라 강가로 내려가 잃어버린 이름을 되찾았습니다.",
+      choiceName: "등불을 따라간다",
+      items: ["젖은 성냥", "작은 등불"],
+      collected: true,
+    },
+    {
+      id: "ending_library_return",
+      workId: "sample_modern_dev",
+      workTitle: "이세계에서 최고 개발자였던 내가 현대에서는 무능력자?",
+      title: "도서관으로 돌아간 개발자",
+      reachedAt: "2026-05-30T00:00:00.000Z",
+      routeSummary: "기록 보관소의 마지막 문서를 열어 원래 세계의 호출을 확인했습니다.",
+      choiceName: "마지막 문서를 펼친다",
+      items: ["깨진 배지", "기록 보관소 열쇠"],
       collected: true,
     },
     {
@@ -56,6 +82,96 @@ const defaultMyhomeState = {
       title: "잠긴 엔딩",
       reachedAt: "",
       routeSummary: "",
+      choiceName: "",
+      items: [],
+      collected: false,
+    },
+    {
+      id: "ending_locked_2",
+      workId: "sample_test_work",
+      workTitle: "테스트 작품",
+      title: "잠긴 엔딩",
+      reachedAt: "",
+      routeSummary: "",
+      choiceName: "",
+      items: [],
+      collected: false,
+    },
+    {
+      id: "ending_locked_3",
+      workId: "sample_test_work",
+      workTitle: "테스트 작품",
+      title: "잠긴 엔딩",
+      reachedAt: "",
+      routeSummary: "",
+      choiceName: "",
+      items: [],
+      collected: false,
+    },
+    {
+      id: "ending_locked_4",
+      workId: "sample_modern_dev",
+      workTitle: "이세계에서 최고 개발자였던 내가 현대에서는 무능력자?",
+      title: "잠긴 엔딩",
+      reachedAt: "",
+      routeSummary: "",
+      choiceName: "",
+      items: [],
+      collected: false,
+    },
+    {
+      id: "ending_locked_5",
+      workId: "sample_modern_dev",
+      workTitle: "이세계에서 최고 개발자였던 내가 현대에서는 무능력자?",
+      title: "잠긴 엔딩",
+      reachedAt: "",
+      routeSummary: "",
+      choiceName: "",
+      items: [],
+      collected: false,
+    },
+    {
+      id: "ending_locked_6",
+      workId: "sample_modern_dev",
+      workTitle: "이세계에서 최고 개발자였던 내가 현대에서는 무능력자?",
+      title: "잠긴 엔딩",
+      reachedAt: "",
+      routeSummary: "",
+      choiceName: "",
+      items: [],
+      collected: false,
+    },
+    {
+      id: "ending_locked_7",
+      workId: "sample_test_work",
+      workTitle: "테스트 작품",
+      title: "잠긴 엔딩",
+      reachedAt: "",
+      routeSummary: "",
+      choiceName: "",
+      items: [],
+      collected: false,
+    },
+    {
+      id: "ending_locked_8",
+      workId: "sample_modern_dev",
+      workTitle: "이세계에서 최고 개발자였던 내가 현대에서는 무능력자?",
+      title: "잠긴 엔딩",
+      reachedAt: "",
+      routeSummary: "",
+      choiceName: "",
+      items: [],
+      collected: false,
+    },
+    {
+      id: "ending_locked_9",
+      workId: "sample_test_work",
+      workTitle: "테스트 작품",
+      title: "잠긴 엔딩",
+      reachedAt: "",
+      routeSummary: "",
+      choiceName: "",
+      items: [],
       collected: false,
     },
   ],
@@ -63,6 +179,7 @@ const defaultMyhomeState = {
 
 let activeView = viewFromHash(location.hash);
 let activeReadingFilter = "all";
+let activeEndingId = "";
 let toastTimer = null;
 
 const $ = (selector) => document.querySelector(selector);
@@ -103,12 +220,26 @@ function readMyhomeState() {
   state.endings = Array.isArray(state.endings) ? state.endings : [];
   if (!state.categories.length) state.categories = clonePlain(defaultMyhomeState.categories);
   if (!state.endings.length) state.endings = clonePlain(defaultMyhomeState.endings);
+  const defaultEndings = new Map(defaultMyhomeState.endings.map((ending) => [ending.id, ending]));
+  state.endings = state.endings.map((ending) => ({ ...clonePlain(defaultEndings.get(ending.id) || {}), ...ending }));
+  defaultMyhomeState.endings.forEach((ending) => {
+    if (!state.endings.some((item) => item.id === ending.id)) state.endings.push(clonePlain(ending));
+  });
   state.categories.forEach((category) => {
     category.id ||= `cat_${Date.now().toString(36)}`;
     category.name ||= "새 카테고리";
     category.tags = Array.isArray(category.tags) ? category.tags : [];
     category.workIds = Array.isArray(category.workIds) ? category.workIds : [];
     category.recommendation ||= "neutral";
+  });
+  state.endings.forEach((ending) => {
+    ending.id ||= `ending_${Date.now().toString(36)}`;
+    ending.workId ||= "";
+    ending.workTitle ||= workById(ending.workId)?.title || "작품";
+    ending.title ||= "잠긴 엔딩";
+    ending.choiceName ||= "";
+    ending.items = Array.isArray(ending.items) ? ending.items : [];
+    ending.collected = Boolean(ending.collected);
   });
   return state;
 }
@@ -151,6 +282,7 @@ function normalizeWork(work, data) {
     views: Number(work.views || 0),
     favorites: Number(work.favorites || 0),
     releaseSettings: work.releaseSettings || { method: "irregular", days: [], hour: "18", minute: "00" },
+    cover: work.cover || { mode: "color", color: "#47645e", showTitle: true },
   };
 }
 
@@ -230,6 +362,16 @@ function statusLabel(status) {
 
 function workHomeHref(workId) {
   return `./phase3_work_home.html?workId=${encodeURIComponent(workId)}`;
+}
+
+function coverInlineStyle(cover = {}) {
+  if (cover.mode === "image" && cover.imageData) return `background:#ffffff; background-image:url('${esc(cover.imageData)}')`;
+  return `background:${esc(cover.color || "#47645e")}`;
+}
+
+function endingCoverStyle(ending) {
+  const work = workById(ending.workId);
+  return coverInlineStyle(work?.cover || { mode: "color", color: ending.collected ? "#47645e" : "#8b948e" });
 }
 
 function showToast(message) {
@@ -401,16 +543,46 @@ function renderCategories() {
 function renderEndings() {
   const endings = readMyhomeState().endings;
   const collectedCount = endings.filter((ending) => ending.collected).length;
+  if (activeEndingId && !endings.some((ending) => ending.id === activeEndingId && ending.collected)) activeEndingId = "";
   $("#endingCount").textContent = `${collectedCount}/${endings.length}개`;
   $("#endingList").innerHTML = endings
     .map(
-      (ending) => `<article class="ending-card ${ending.collected ? "" : "is-locked"}">
-        <strong>${ending.collected ? esc(ending.title) : "잠긴 엔딩"}</strong>
-        <p>${esc(ending.workTitle || workById(ending.workId)?.title || "작품")}</p>
-        <p>${ending.collected ? `${formatDate(ending.reachedAt)} 도달 · ${esc(ending.routeSummary)}` : "아직 도달하지 않은 엔딩입니다."}</p>
-      </article>`,
+      (ending) => `<button class="ending-card ${ending.collected ? "" : "is-locked"} ${activeEndingId === ending.id ? "active" : ""}" type="button" data-ending-id="${esc(ending.id)}">
+        <span class="ending-cover" style="${endingCoverStyle(ending)}">
+          <strong>${ending.collected ? esc(ending.title) : "잠긴 엔딩"}</strong>
+        </span>
+        <span class="ending-card-info">
+          <b>${esc(ending.workTitle || workById(ending.workId)?.title || "작품")}</b>
+          <em>${ending.collected ? `${formatDate(ending.reachedAt)} 도달` : "아직 도달하지 않았습니다."}</em>
+        </span>
+      </button>`,
     )
     .join("");
+  renderEndingDetail(endings);
+}
+
+function renderEndingDetail(endings) {
+  const detail = $("#endingDetail");
+  const ending = endings.find((item) => item.id === activeEndingId && item.collected);
+  if (!detail || !ending) {
+    if (detail) {
+      detail.hidden = true;
+      detail.innerHTML = "";
+    }
+    return;
+  }
+  const items = ending.items.length ? ending.items : ["얻은 아이템 없음"];
+  detail.hidden = false;
+  detail.innerHTML = `<h3>엔딩까지의 여정</h3>
+    <div class="ending-journey-choice">
+      <span>선택지 이름</span>
+      <strong>${esc(ending.choiceName || "기록된 선택지 없음")}</strong>
+    </div>
+    <p>${esc(ending.routeSummary || "기록된 여정이 없습니다.")}</p>
+    <div class="ending-item-section">
+      <span>얻은 아이템 목록</span>
+      <div class="ending-item-list">${items.map((item) => `<b>${esc(item)}</b>`).join("")}</div>
+    </div>`;
 }
 
 function renderUserSummary() {
@@ -499,6 +671,19 @@ function bindEvents() {
     const continueButton = event.target.closest("[data-continue-work]");
     if (continueButton) {
       continueWork(continueButton.dataset.continueWork);
+      return;
+    }
+
+    const endingButton = event.target.closest("[data-ending-id]");
+    if (endingButton) {
+      const ending = readMyhomeState().endings.find((item) => item.id === endingButton.dataset.endingId);
+      if (!ending?.collected) {
+        showToast("아직 도달하지 않은 엔딩입니다.");
+        return;
+      }
+      activeEndingId = ending.id;
+      renderEndings();
+      $("#endingDetail")?.scrollIntoView({ block: "nearest" });
       return;
     }
 

@@ -4,8 +4,8 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>숲글:숲갈래글 (알파테스트:0.0.6)</title>
-    <link rel="stylesheet" href="./css/phase2_alpha_front_home_view.css" />
-    <link rel="stylesheet" href="./css/home_app_shell.css" />
+    <link rel="stylesheet" href="./css/phase2_alpha_front_home_view.css?v=0.0.17" />
+    <link rel="stylesheet" href="./css/home_app_shell.css?v=0.0.18" />
   </head>
   <body data-shell-page="home" data-shell-right="home">
     <div data-shell-content>
@@ -20,16 +20,16 @@
 
       <section class="notice-line" aria-label="알파테스트 안내">
         <button type="button" data-empty-action="테스트 공지">
-          결제 루틴은 아직 연결하지 않고, 사이트 내부 가상 골드만 사용합니다.
+          결제 루틴은 아직 연결하지 않고, 사이트 내부 가상 숲결만 사용합니다.
         </button>
       </section>
 
-      <section class="best-strip" aria-labelledby="bestTitle">
+      <section class="recommend-strip" aria-labelledby="recommendTitle">
         <div class="section-head">
-          <h1 id="bestTitle">유료 베스트</h1>
-          <a href="./phase2_best_rankings.html?tab=paid">더보기</a>
+          <h1 id="recommendTitle">지금 추천 작품</h1>
+          <span>광고 슬롯</span>
         </div>
-        <div class="cover-rank-grid" id="paidBestGrid"></div>
+        <div class="recommend-scroll" id="recommendList"></div>
       </section>
 
       <section class="work-feed" aria-labelledby="workFeedTitle">
@@ -41,7 +41,7 @@
       </section>
     </div>
 
-    <script type="module" src="./js/home_app_shell.js"></script>
-    <script type="module" src="./js/phase2_alpha_front_home_app.js"></script>
+    <script type="module" src="./js/home_app_shell.js?v=0.0.18"></script>
+    <script type="module" src="./js/phase2_alpha_front_home_app.js?v=0.0.17"></script>
   </body>
 </html>

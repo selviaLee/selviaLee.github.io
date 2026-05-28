@@ -17,6 +17,8 @@ const fallbackWorks = [
     interactive: true,
     adult: false,
     updated: true,
+    coverColor: "#284a36",
+    recommendCopy: "첫 선택부터 갈림길이 열리는 숲속 갈래글",
     releaseSettings: { method: "regular", days: ["월", "수", "금"], hour: "18", minute: "00" },
   },
   {
@@ -32,9 +34,12 @@ const fallbackWorks = [
     interactive: false,
     adult: false,
     updated: false,
+    coverColor: "#587965",
+    recommendCopy: "차분한 문장으로 밤에 읽기 좋은 연재",
     releaseSettings: { method: "irregular", days: [], hour: "18", minute: "00" },
   },
   {
+    id: "sample_night_weight",
     title: "오늘 밤 한 글자의 무게",
     author: "연녹",
     genre1: "현대",
@@ -46,9 +51,12 @@ const fallbackWorks = [
     interactive: false,
     adult: false,
     updated: true,
+    coverColor: "#334f58",
+    recommendCopy: "짧은 회차마다 감정의 무게가 남는 일반글",
     releaseSettings: { method: "irregular", days: [], hour: "18", minute: "00" },
   },
   {
+    id: "sample_black_bookshop",
     title: "검은 책방의 주인",
     author: "문장연자",
     genre1: "미스터리",
@@ -60,9 +68,12 @@ const fallbackWorks = [
     interactive: true,
     adult: false,
     updated: false,
+    coverColor: "#2c3934",
+    recommendCopy: "책장을 넘길 때마다 단서가 바뀌는 미스터리",
     releaseSettings: { method: "regular", days: ["화", "목"], hour: "20", minute: "30" },
   },
   {
+    id: "sample_moon_archive",
     title: "달빛 저장소의 사서들",
     author: "이월",
     genre1: "서정",
@@ -74,9 +85,12 @@ const fallbackWorks = [
     interactive: false,
     adult: false,
     updated: false,
+    coverColor: "#52616d",
+    recommendCopy: "완결까지 바로 달릴 수 있는 서정 판타지",
     releaseSettings: { method: "irregular", days: [], hour: "18", minute: "00" },
   },
   {
+    id: "sample_dice_choice",
     title: "주사위는 선택지를 믿지 않는다",
     author: "서바",
     genre1: "성장",
@@ -88,6 +102,8 @@ const fallbackWorks = [
     interactive: true,
     adult: true,
     updated: true,
+    coverColor: "#2f5d46",
+    recommendCopy: "선택지를 믿지 않는 독자를 위한 성장 갈래글",
     releaseSettings: { method: "regular", days: ["월", "화", "수"], hour: "22", minute: "00" },
   },
 ];
@@ -156,6 +172,9 @@ function currentWorks() {
         interactive: work.type === "interactive",
         adult: work.isAdult === "adult",
         updated: true,
+        coverImage: work.coverImage || work.cover?.imageData || "",
+        coverColor: work.coverColor || work.cover?.color || "#47645e",
+        recommendCopy: work.recommendCopy || work.adCopy || `${work.title || "작품"}을 지금 추천합니다.`,
         releaseSettings: work.releaseSettings || { method: "irregular", days: [], hour: "18", minute: "00" },
       }))
     : [];
@@ -199,24 +218,33 @@ function renderAccount() {
   $("#createWorkButton")?.classList.toggle("hidden", !loggedIn);
   $("#walletCard")?.classList.toggle("is-ghost", !loggedIn);
   $("#walletUserName").textContent = session.user?.name || "테스트계정";
-  $("#goldBalance").textContent = `${Number(session.gold || 0).toLocaleString("ko-KR")}골드`;
+  $("#goldBalance").textContent = `${Number(session.gold || 0).toLocaleString("ko-KR")}숲결`;
   $("#walletChargeButton").textContent = "충전";
 }
 
-function renderPaidBest() {
-  const paidBest = currentWorks()
-    .filter((work) => work.paid)
-    .sort((a, b) => b.views - a.views)
-    .slice(0, 3);
+function coverStyle(work) {
+  if (work.coverImage) return `background-image: url('${esc(work.coverImage)}')`;
+  const color = work.coverColor || "#47645e";
+  return `background: linear-gradient(145deg, rgba(255, 255, 255, 0.16), transparent 44%), linear-gradient(145deg, ${esc(color)}, #9db98b)`;
+}
 
-  $("#paidBestGrid").innerHTML = paidBest
+function recommendedWorks() {
+  return currentWorks()
+    .filter((work) => work.recommended !== false)
+    .sort((a, b) => Number(Boolean(b.updated)) - Number(Boolean(a.updated)) || b.views - a.views)
+    .slice(0, 10);
+}
+
+function renderRecommendations() {
+  $("#recommendList").innerHTML = recommendedWorks()
     .map(
-      (work, index) => `<a class="rank-card" href="${workHref(work)}">
-        <span class="mini-cover">${index + 1}</span>
-        <span>
+      (work) => `<a class="recommend-card" href="${workHref(work)}">
+        <span class="recommend-cover" style="${coverStyle(work)}">
+          <span class="recommend-copy">${esc(work.recommendCopy || "지금 읽기 좋은 숲속의 한 편")}</span>
           <strong>${esc(work.title)}</strong>
-          <span class="meta">${esc(work.author)} · ${esc(work.latest)} · ${formatNumber(work.views)}</span>
         </span>
+        <b>${esc(work.title)}</b>
+        <em>${esc(work.author)} · ${esc(work.latest)} · ${formatNumber(work.views)}</em>
       </a>`,
     )
     .join("");
@@ -238,7 +266,11 @@ function renderWorks() {
       (work, index) => `<article class="work-row">
         <strong class="rank-no">${index + 1}</strong>
         <div>
-          <a class="work-title" href="${workHref(work)}">${esc(work.title)}</a>
+          <div class="work-title-line">
+            <a class="work-title" href="${workHref(work)}">${esc(work.title)}</a>
+            <span class="title-badge ${work.interactive ? "branch" : "normal"}">${work.interactive ? "갈래글" : "일반글"}</span>
+            <span class="title-badge ${work.paid ? "paid" : "free"}">${work.paid ? "유료" : "무료"}</span>
+          </div>
           <div class="work-info">
             <span>${esc(work.author)}</span>
             <span>${esc(work.genre1)}</span>
@@ -249,9 +281,6 @@ function renderWorks() {
           <div class="work-stats">
             <span>조회 ${formatNumber(work.views)}</span>
             <span>선호 ${formatNumber(work.favorites)}</span>
-            ${work.paid ? `<span class="badge paid">유료</span>` : `<span class="badge">무료</span>`}
-            ${work.interactive ? `<span class="badge">갈래글</span>` : ""}
-            ${work.adult ? `<span class="badge adult">민감</span>` : ""}
           </div>
         </div>
       </article>`,
@@ -341,7 +370,7 @@ function bindEvents() {
 
 function boot() {
   renderAccount();
-  renderPaidBest();
+  renderRecommendations();
   renderWorks();
   renderRails();
   bindEvents();

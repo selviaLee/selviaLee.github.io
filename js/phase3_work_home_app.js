@@ -272,7 +272,7 @@ function renderHero(data, work) {
       <p>${esc(work.description || "작품 소개가 없습니다.")}</p>
       <button type="button" data-description-toggle>더보기</button>
     </div>
-    <button class="promo-row alpha-row" type="button" data-empty><span>${iconSvg("alpha")}</span><strong>알파테스트</strong><em>충전 골드로 구매 흐름을 테스트할 수 있습니다.</em><b>›</b></button>
+    <button class="promo-row alpha-row" type="button" data-empty><span>${iconSvg("alpha")}</span><strong>알파테스트</strong><em>충전 숲결로 구매 흐름을 테스트할 수 있습니다.</em><b>›</b></button>
     <button class="favorite-button" type="button" data-favorite><span>${iconSvg("bookmark")}</span><strong>선호작품</strong></button>
   </section>`;
 }

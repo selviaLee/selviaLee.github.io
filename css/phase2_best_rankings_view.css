@@ -1,12 +1,12 @@
 :root {
   color-scheme: light;
-  --bg: #ffffff;
+  --bg: #fbfcf7;
   --paper: #ffffff;
-  --ink: #24262b;
-  --muted: #777f89;
-  --line: #e9e9e9;
-  --soft: #f5f5f5;
-  --accent: #111111;
+  --ink: #1e2d24;
+  --muted: #6e7b70;
+  --line: #dfe7dc;
+  --soft: #eef5ec;
+  --accent: #244635;
   --danger: #ef3f50;
   --topbar: 60px;
   --bottom-nav: 55px;
@@ -217,18 +217,19 @@ a {
 .best-head {
   min-height: 92px;
   padding: 8px 10px 18px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid #d7e3d3;
 }
 
 .best-head p {
   margin: 0 0 8px;
-  color: #2e5bff;
+  color: #6f8f5d;
   font-size: 12px;
   font-weight: 900;
 }
 
 .best-head h1 {
   margin: 0 0 7px;
+  color: var(--accent);
   font-size: 28px;
 }
 
@@ -238,24 +239,108 @@ a {
 
 .best-tabs {
   display: flex;
-  gap: 24px;
+  gap: 8px;
   min-height: 56px;
   padding: 15px 10px;
-  border-bottom: 3px solid #111;
+  border-bottom: 3px solid var(--accent);
 }
 
 .best-tabs button {
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
   color: #999;
   font-size: 16px;
   font-weight: 800;
 }
 
 .best-tabs .active {
-  color: #111;
+  background: #e8f3ed;
+  color: var(--accent);
+}
+
+.best-top-strip {
+  padding: 18px 0 20px;
+}
+
+.section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.section-head h2 {
+  margin: 0;
+  color: var(--accent);
+  font-size: 18px;
+}
+
+.best-cover-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.best-cover-card {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.best-cover {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 4 / 5;
+  padding: 16px;
+  border-radius: 6px;
+  background-size: cover !important;
+  background-position: center !important;
+  color: #fffdf5;
+  font-size: clamp(16px, 2.1vw, 24px);
+  font-weight: 900;
+  line-height: 1.25;
+  text-align: center;
+  word-break: keep-all;
+  box-shadow: inset 0 0 0 1px rgba(255, 253, 245, 0.2), 0 10px 22px rgba(31, 77, 56, 0.14);
+}
+
+.best-cover-rank {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: grid;
+  place-items: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: rgba(30, 45, 36, 0.82);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.best-cover-card strong,
+.best-cover-card span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.best-cover-card strong {
+  font-size: 14px;
+}
+
+.best-cover-card span:last-child {
+  color: var(--muted);
+  font-size: 12px;
 }
 
 .ranking-list {
-  border-top: 1px solid var(--line);
+  border-top: 1px solid #d7e3d3;
 }
 
 .ranking-row {
@@ -264,7 +349,11 @@ a {
   gap: 14px;
   align-items: center;
   min-height: 78px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 1px solid #d7e3d3;
+}
+
+.ranking-row:hover {
+  background: rgba(238, 245, 236, 0.62);
 }
 
 .rank-no {
@@ -298,21 +387,49 @@ a {
   min-height: 20px;
   padding: 0 7px;
   border-radius: 999px;
-  background: var(--soft);
-  color: var(--ink);
+  background: #e5f0e5;
+  color: #244635;
   font-size: 11px;
   font-weight: 900;
 }
 
 .badge.paid {
-  background: #fff1cc;
-  color: #7b5800;
+  background: #efe3ba;
+  color: #6c5526;
 }
 
 .score {
-  color: #111;
+  color: var(--accent);
   font-size: 13px;
   font-weight: 900;
+}
+
+.empty-ranking {
+  margin: 0;
+  padding: 24px 10px;
+  color: var(--muted);
+  font-size: 14px;
+  font-weight: 800;
+}
+
+.load-more-rankings {
+  display: block;
+  width: min(240px, 100%);
+  min-height: 42px;
+  margin: 18px auto 0;
+  border: 1px solid #dce6dd;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--accent);
+  font-weight: 900;
+}
+
+.load-more-rankings:hover {
+  background: #f5f8f4;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .toast {
@@ -384,8 +501,39 @@ a {
   }
 
   .best-tabs {
+    gap: 4px;
     margin-inline: -15px;
     padding-inline: 15px;
+  }
+
+  .best-tabs button {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 0 6px;
+    font-size: 14px;
+  }
+
+  .tab-extra {
+    display: none;
+  }
+
+  .best-cover-grid {
+    grid-template-columns: repeat(3, minmax(96px, 1fr));
+  }
+
+  .best-cover {
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 13px;
+  }
+
+  .best-cover-rank {
+    top: 6px;
+    left: 6px;
+    min-width: 22px;
+    height: 22px;
+    padding: 0 6px;
+    font-size: 11px;
   }
 
   .ranking-row {
