@@ -1,15 +1,17 @@
+import { formatWalletGold, normalizeWalletSession } from "./currency_wallet.js";
+
 const SHELL_SESSION_KEY = "supgeul_phase2_alpha_session";
 
 function readShellSession() {
   try {
-    return JSON.parse(localStorage.getItem(SHELL_SESSION_KEY)) || { user: null, gold: 0 };
+    return normalizeWalletSession(JSON.parse(localStorage.getItem(SHELL_SESSION_KEY)) || { user: null });
   } catch {
-    return { user: null, gold: 0 };
+    return normalizeWalletSession({ user: null });
   }
 }
 
 function writeShellSession(session) {
-  localStorage.setItem(SHELL_SESSION_KEY, JSON.stringify(session));
+  localStorage.setItem(SHELL_SESSION_KEY, JSON.stringify(normalizeWalletSession(session)));
 }
 
 function shellIcon(name) {
@@ -27,6 +29,8 @@ function shellIcon(name) {
     bell: "bell_flower.svg",
     mail: "mail_bark.svg",
     search: "search_leaf.svg",
+    help: "book_leaf.svg",
+    my: "my_menu_leaf.svg",
   };
   const fileName = icons[name] || icons.home;
   return `<img class="shell-icon-img" src="./assets/icons/forest/${fileName}" alt="" aria-hidden="true" />`;
@@ -57,6 +61,7 @@ function renderSidebar(page, navMode) {
   return `<aside class="pc-sidebar">
     <nav class="user-shortcut-list" aria-label="홈 바로가기">
       ${navItem("./phase2_alpha_front_home.html", "home", "홈", "home", page)}
+      ${navItem("./site_help_guides.html", "help", "도움말", "help", page)}
       <a id="paidBestShortcut" class="${page === "paidBest" ? "active" : ""}" href="./phase2_best_rankings.html?tab=paid"><span>${shellIcon("paid")}</span>유료 베스트</a>
       <a id="freeBestShortcut" class="${page === "freeBest" ? "active" : ""}" href="./phase2_best_rankings.html?tab=free"><span>${shellIcon("free")}</span>무료 베스트</a>
       ${navItem("./phase7_gold_shop_charge.html", "shop", "숲상점", "shop", page)}
@@ -110,9 +115,10 @@ function shellTemplate({ page, rightMode, navMode }) {
         <button class="notice-icon" type="button" data-empty-action="알림" aria-label="알림">${shellIcon("bell")}<span>4</span></button>
         <button type="button" data-empty-action="쪽지" aria-label="쪽지">${shellIcon("mail")}</button>
       </div>
-      <button class="profile-circle" type="button" id="profileEntry" aria-label="로그인 또는 마이 메뉴">로그인</button>
+      <button class="profile-circle" type="button" id="profileEntry" aria-label="로그인 또는 마이 메뉴"><span class="profile-icon">${shellIcon("my")}</span><span class="profile-label">로그인</span></button>
       <div class="profile-menu hidden" id="profileMenu" aria-label="프로필 메뉴">
         <a href="./phase6_myhome_home.html">마이홈</a>
+        <a href="./site_help_guides.html">도움말</a>
         <a href="./author_work_list.html">작가작업실</a>
         <button type="button" id="logoutUser">로그아웃</button>
       </div>
@@ -128,7 +134,7 @@ function shellTemplate({ page, rightMode, navMode }) {
     <a class="nav-item ${page === "paidBest" || page === "freeBest" ? "active" : ""}" href="./phase2_best_rankings.html?tab=paid"><span class="icon">${shellIcon("paid")}</span><span>베스트</span></a>
     <a class="nav-item ${page === "shop" ? "active" : ""}" href="./phase7_gold_shop_charge.html"><span class="icon">${shellIcon("shop")}</span><span>숲상점</span></a>
     <a class="nav-item ${page === "library" || page === "myhome" ? "active" : ""}" href="./phase6_myhome_home.html"><span class="icon">${shellIcon("library")}</span><span>보관함</span></a>
-    <button class="nav-item" type="button" id="mobileMyMenu"><span class="nav-profile-circle"></span><span>마이 메뉴</span></button>
+    <button class="nav-item" type="button" id="mobileMyMenu"><span class="icon">${shellIcon("my")}</span><span>마이 메뉴</span></button>
   </nav>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>`;
 }
@@ -140,13 +146,15 @@ function updateShellAccount() {
 
   profileEntry?.classList.toggle("logged-in", loggedIn);
   if (profileEntry) {
-    profileEntry.textContent = loggedIn ? "" : "로그인";
+    const profileLabel = profileEntry.querySelector(".profile-label");
+    if (profileLabel) profileLabel.textContent = loggedIn ? "" : "로그인";
+    else profileEntry.textContent = loggedIn ? "" : "로그인";
     profileEntry.setAttribute("aria-label", loggedIn ? "마이 메뉴" : "로그인 또는 회원가입");
   }
   document.querySelector("#createWorkButton")?.classList.toggle("hidden", !loggedIn);
   document.querySelector("#walletCard")?.classList.toggle("is-ghost", !loggedIn);
   if (document.querySelector("#walletUserName")) document.querySelector("#walletUserName").textContent = session.user?.name || "테스트계정";
-  if (document.querySelector("#goldBalance")) document.querySelector("#goldBalance").textContent = `${Number(session.gold || 0).toLocaleString("ko-KR")}숲결`;
+  if (document.querySelector("#goldBalance")) document.querySelector("#goldBalance").textContent = formatWalletGold(session);
 }
 
 function authNextPath() {
@@ -180,7 +188,7 @@ function bindShellEvents(page) {
     location.href = "./phase6_myhome_home.html";
   });
   document.querySelector("#logoutUser")?.addEventListener("click", () => {
-    writeShellSession({ user: null, gold: 0 });
+    writeShellSession({ ...readShellSession(), user: null });
     updateShellAccount();
     document.querySelector("#profileMenu")?.classList.add("hidden");
     window.dispatchEvent(new CustomEvent("supgeul:shell-session-change", { detail: { page } }));
@@ -200,6 +208,7 @@ function mountHomeShell() {
   source.remove();
   updateShellAccount();
   bindShellEvents(page);
+  window.addEventListener("supgeul:shell-session-change", updateShellAccount);
 }
 
 mountHomeShell();

@@ -241,6 +241,7 @@ function iconSvg(name) {
     notice: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h14v16H5z"/><path d="M8 8h8"/><path d="M8 12h8"/><path d="M8 16h5"/></svg>`,
     review: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H8l-3 3z"/><path d="M8 9h8"/><path d="M8 12h5"/></svg>`,
     bookmark: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4h10v16l-5-3.2L7 20z"/></svg>`,
+    guide: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h10a4 4 0 0 1 4 4v12H9a4 4 0 0 0-4-4z"/><path d="M9 8h6"/><path d="M9 11h5"/><path d="M5 4v12"/></svg>`,
   };
   return icons[name] || icons.alpha;
 }
@@ -251,7 +252,7 @@ function renderHero(data, work) {
   <section class="joara-hero">
     <div class="blur-backdrop" style="${coverStyle(work.cover)}"></div>
     <div class="cover-center">
-      <div class="book-cover ${work.cover?.showTitle === false ? "no-title" : ""}" style="${coverStyle(work.cover)}">${work.cover?.showTitle === false ? "" : esc(work.title)}</div>
+      <div class="book-cover" style="${coverStyle(work.cover)}"></div>
     </div>
   </section>
   <section class="work-summary">
@@ -273,6 +274,7 @@ function renderHero(data, work) {
       <button type="button" data-description-toggle>더보기</button>
     </div>
     <button class="promo-row alpha-row" type="button" data-empty><span>${iconSvg("alpha")}</span><strong>알파테스트</strong><em>충전 숲결로 구매 흐름을 테스트할 수 있습니다.</em><b>›</b></button>
+    <a class="promo-row guide-row" href="./site_help_guides.html?role=reader"><span>${iconSvg("guide")}</span><strong>도움말</strong><em>작품홈과 읽기 기능을 익히고 제목별 500숲결 받기</em><b>›</b></a>
     <button class="favorite-button" type="button" data-favorite><span>${iconSvg("bookmark")}</span><strong>선호작품</strong></button>
   </section>`;
 }
@@ -432,7 +434,7 @@ function renderChapters(work, episodes) {
 function workCard(data, work) {
   const tags = (work.normalTags || []).slice(0, 4);
   return `<a class="related-card" href="./phase3_work_home.html?workId=${encodeURIComponent(work.id)}">
-    <div class="related-cover" style="${coverStyle(work.cover)}">${work.cover?.showTitle === false ? "" : esc(work.title)}</div>
+    <div class="related-cover" style="${coverStyle(work.cover)}"></div>
     <div>
       <p>${esc(work.genre1 || "기타")} · ${typeText(work.type)}</p>
       <strong>${esc(work.title)}</strong>
@@ -446,7 +448,7 @@ function workCard(data, work) {
 
 function recommendationCard(item) {
   return `<a class="related-card" href="./phase3_work_home.html">
-    <div class="related-cover" style="background:${esc(item.cover.color)}">${esc(item.cover.text)}</div>
+    <div class="related-cover" style="background:${esc(item.cover.color)}"></div>
     <div>
       <p>${esc(item.genre)}</p>
       <strong>${esc(item.title)}</strong>

@@ -191,6 +191,7 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 6px;
   min-width: 64px;
   height: 34px;
   padding: 0 13px;
@@ -202,6 +203,18 @@ a {
   font-weight: 900;
 }
 
+.profile-icon {
+  display: none;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+}
+
+.profile-icon .shell-icon-img {
+  width: 18px;
+  height: 18px;
+}
+
 .profile-circle.logged-in {
   width: 32px;
   min-width: 32px;
@@ -210,8 +223,15 @@ a {
   border: 3px solid #244635;
   border-radius: 50%;
   background: #eef5ec;
-  color: transparent;
-  font-size: 0;
+  color: #244635;
+}
+
+.profile-circle.logged-in .profile-icon {
+  display: grid;
+}
+
+.profile-circle.logged-in .profile-label {
+  display: none;
 }
 
 .profile-menu {
@@ -590,10 +610,18 @@ body[data-shell-nav="myhome"] .left-extension-card {
     min-width: 32px;
     height: 32px;
     padding: 0;
-    border: 3px solid #000;
+    border: 2px solid #244635;
     border-radius: 50%;
-    color: transparent;
-    font-size: 0;
+    background: #eef5ec;
+    color: #244635;
+  }
+
+  .profile-circle .profile-icon {
+    display: grid;
+  }
+
+  .profile-circle .profile-label {
+    display: none;
   }
 
   .main-container {
@@ -622,6 +650,8 @@ body[data-shell-nav="myhome"] .left-extension-card {
     z-index: 80;
     display: grid;
     grid-template-columns: repeat(5, 1fr);
+    align-items: stretch;
+    justify-content: stretch;
     height: var(--bottom-nav);
     border-top: 1px solid var(--line);
     background: #fff;
@@ -645,10 +675,8 @@ body[data-shell-nav="myhome"] .left-extension-card {
     height: 24px;
   }
 
-  .nav-profile-circle {
-    width: 36px;
-    height: 24px;
-    border: 4px solid #000;
-    border-radius: 50%;
+  .nav-item .shell-icon-img {
+    width: 22px;
+    height: 22px;
   }
 }

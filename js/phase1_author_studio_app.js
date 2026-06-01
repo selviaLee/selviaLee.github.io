@@ -48,6 +48,7 @@ function navigate(page, params = {}) {
 
 function refreshChrome() {
   const state = loadState();
+  if (!$("#workspaceTitle") || !$("#officialNickname") || !$("#sideNav")) return;
   $("#workspaceTitle").textContent = state.authorProfile.workspaceTitle || "숲글 작가 작업실";
   $("#officialNickname").textContent = currentUser().officialNickname || "공식 닉네임 없음";
   let version = $("#appVersion");
@@ -130,7 +131,7 @@ function workCard(work) {
     <div class="work-content">
       <div class="work-info-row">
         <div class="work-cover-area">
-          <div class="cover ${work.cover?.showTitle === false ? "no-title" : ""}" ${coverStyle}>${esc(work.title)}</div>
+          <div class="cover" ${coverStyle}></div>
         </div>
         <div class="work-main">
           <div class="card-topline">
@@ -858,6 +859,9 @@ function renderEditor() {
   const state = loadState();
   const work = state.works.find((item) => item.id === route.workId) || state.works[0];
   const episodes = workEpisodes(work.id);
+  const world = workWorld(work);
+  const characters = world ? state.characters.filter((character) => character.worldbuildingId === world.id) : [];
+  const items = world ? state.items.filter((item) => item.worldbuildingId === world.id) : [];
   const episode = state.episodes.find((item) => item.id === route.episodeId) || {
     id: uid("ep"),
     workId: work.id,
@@ -871,16 +875,36 @@ function renderEditor() {
     isPaid: false,
     price: 0,
   };
+  const previous = previousEpisodeForEditor(episodes, episode);
   app.innerHTML =
-    shell("화 작성 에디터", esc(work.title)) +
-    `<form class="form-card editor-form" id="episodeForm">
-      <div class="grid two"><div class="form-row"><label>화 선택</label><select id="episodeSelect"><option value="">새 화</option>${episodes.map((ep) => `<option value="${ep.id}" ${ep.id === episode.id ? "selected" : ""}>${ep.episodeNo}화 ${esc(ep.title)}</option>`)}</select></div><div class="form-row"><label>화 제목</label><input name="title" value="${esc(episode.title)}" required placeholder="예: 프롤로그, 숲의 문이 열리는 밤" /></div></div>
-      ${work.type === "interactive" ? `<div class="form-row"><label>필수 이전 홧수</label><select name="requiredPreviousEpisodeNo"><option value="">없음</option>${episodes.filter((ep) => ep.id !== episode.id).map((ep) => `<option value="${ep.episodeNo}" ${String(episode.requiredPreviousEpisodeNo) === String(ep.episodeNo) ? "selected" : ""}>${ep.episodeNo}화 ${esc(ep.title)}</option>`)}</select><p class="helper">필수 이전 홧수는 이 화를 보기 전에 반드시 지나쳐야 하는 화입니다. 없음이면 별도 진입 조건이 없습니다. 특정 분기를 지나온 독자에게만 보여주려면 그 분기 화를 선택하고, 갈래글 형식으로 일반 순차 연재를 하려면 바로 전 화를 선택하세요.</p></div>` : ""}
-      <div class="editor-tools">${work.type === "interactive" ? `<button type="button" class="secondary-btn" data-insert="[[선택지:\\n무엇을 한다.\\n아무것도 안한다.\\n]]">선택지</button><button type="button" class="secondary-btn" data-insert="[[씬:무엇을 한다.\\n무엇을 했다.\\n]]">씬</button><button type="button" class="secondary-btn" data-insert="[[+아이템]]">+아이템</button><button type="button" class="secondary-btn" data-insert="[[엔딩:이름\\n내용\\n]]">엔딩</button>` : ""}</div>
-      <div class="form-row"><label>본문</label><textarea class="manuscript" id="bodyInput" name="body" placeholder="${work.type === "interactive" ? "본문을 쓰고 [[선택지:]], [[씬:]], [[+아이템]] 문법을 사용할 수 있습니다." : "첫 문장을 적어보세요. 독자가 보는 줄폭에 가깝게 작성됩니다."}">${esc(episode.body)}</textarea></div>
-      <div class="form-row"><label>작가의 말</label><textarea name="authorNote" placeholder="생략하면 작가의 말이 표시되지 않습니다.">${esc(episode.authorNote)}</textarea></div>
-      <div class="step-actions"><button class="secondary-btn" data-save="draft">임시 저장</button><button class="primary-btn" data-save="queued">등록/대기열 보내기</button><button type="button" class="secondary-btn" id="previewEpisode">미리보기</button><button type="button" class="secondary-btn" id="backDashboard">작품목록으로 돌아가기</button></div>
-    </form>`;
+    `<section class="writer-focus-shell">
+      <header class="writer-focus-header">
+        <div>
+          <p class="eyebrow">집중 작성</p>
+          <h1>${esc(work.title)}</h1>
+        </div>
+        <div class="writer-focus-actions">
+          <button type="button" class="secondary-btn mobile-world-toggle" id="quickWorldToggle" aria-expanded="false">...</button>
+          <a class="secondary-btn writer-help-link" href="./site_help_guides.html?role=author">도움말</a>
+          <button type="button" class="secondary-btn" id="backDashboard">작품목록으로 돌아가기</button>
+        </div>
+      </header>
+      <div class="writer-focus-layout">
+        ${previousEpisodePane(previous)}
+        <form class="writer-center-panel editor-form" id="episodeForm">
+          <div class="writer-center-top">
+            <div class="form-row"><label>화 선택</label><select id="episodeSelect"><option value="">새 화</option>${episodes.map((ep) => `<option value="${ep.id}" ${ep.id === episode.id ? "selected" : ""}>${ep.episodeNo}화 ${esc(ep.title)}</option>`)}</select></div>
+            <div class="form-row"><label>화 제목</label><input name="title" value="${esc(episode.title)}" required placeholder="예: 프롤로그, 숲의 문이 열리는 밤" /></div>
+          </div>
+          ${work.type === "interactive" ? `<div class="form-row compact-guide"><label>필수 이전 홧수</label><select name="requiredPreviousEpisodeNo"><option value="">없음</option>${episodes.filter((ep) => ep.id !== episode.id).map((ep) => `<option value="${ep.episodeNo}" ${String(episode.requiredPreviousEpisodeNo) === String(ep.episodeNo) ? "selected" : ""}>${ep.episodeNo}화 ${esc(ep.title)}</option>`)}</select><p class="helper">분기 진입 조건입니다. 없음이면 별도 조건 없이 읽을 수 있습니다.</p></div>` : ""}
+          <div class="editor-tools">${work.type === "interactive" ? `<button type="button" class="secondary-btn" data-insert="[[선택지:\\n무엇을 한다.\\n아무것도 안한다.\\n]]">선택지</button><button type="button" class="secondary-btn" data-insert="[[씬:무엇을 한다.\\n무엇을 했다.\\n]]">씬</button><button type="button" class="secondary-btn" data-insert="[[+아이템]]">+아이템</button><button type="button" class="secondary-btn" data-insert="[[-아이템]]">-아이템</button><button type="button" class="secondary-btn" data-insert="[[엔딩:이름\\n내용\\n]]">엔딩</button>` : ""}</div>
+          <div class="form-row manuscript-row"><label>본문</label><textarea class="manuscript" id="bodyInput" name="body" placeholder="${work.type === "interactive" ? "본문을 쓰고 [[선택지:]], [[씬:]], [[+아이템]], [[-아이템]] 문법을 사용할 수 있습니다." : "첫 문장을 적어보세요. 독자가 보는 줄폭에 가깝게 작성됩니다."}">${esc(episode.body)}</textarea></div>
+          <div class="form-row"><label>작가의 말</label><textarea class="author-note-input" name="authorNote" placeholder="생략하면 작가의 말이 표시되지 않습니다.">${esc(episode.authorNote)}</textarea></div>
+          <div class="step-actions writer-save-actions"><button class="secondary-btn" data-save="draft">임시 저장</button><button class="primary-btn" data-save="queued">등록/대기열 보내기</button><button type="button" class="secondary-btn" id="previewEpisode">미리보기</button></div>
+        </form>
+        ${worldQuickPanel(world, characters, items)}
+      </div>
+    </section>`;
   $("#episodeSelect").addEventListener("change", (event) => navigate("editor", { workId: work.id, episodeId: event.target.value || undefined }));
   $$("[data-insert]").forEach((button) => button.addEventListener("click", () => insertText($("#bodyInput"), button.dataset.insert.replaceAll("\\n", "\n"))));
   $("#previewEpisode").addEventListener("click", () => {
@@ -888,12 +912,382 @@ function renderEditor() {
     navigate("preview", { workId: work.id, episodeId: episode.id });
   });
   $("#backDashboard").addEventListener("click", () => navigate("dashboard"));
+  $("#quickWorldToggle")?.addEventListener("click", () => toggleQuickWorldPanel());
+  $("#quickWorldClose")?.addEventListener("click", () => closeQuickWorldPanel());
+  bindQuickWorldForms(work, world, characters, items);
+  bindWorldAutocomplete($("#bodyInput"), world, characters, items);
   preventEnterSubmit($("#episodeForm"));
   $("#episodeForm").addEventListener("submit", (event) => {
     event.preventDefault();
     const status = event.submitter?.dataset.save || "draft";
     saveEpisode(work, episode, event.currentTarget, status, true);
   });
+}
+
+function previousEpisodeForEditor(episodes, episode) {
+  const currentNo = Number(episode.episodeNo || 0);
+  if (currentNo <= 0 && episode.title) return null;
+  const candidates = episodes
+    .filter((item) => item.id !== episode.id)
+    .filter((item) => Number(item.episodeNo || 0) < currentNo || !episode.title)
+    .sort((a, b) => Number(b.episodeNo || 0) - Number(a.episodeNo || 0));
+  return candidates[0] || episodes.filter((item) => item.id !== episode.id).at(-1) || null;
+}
+
+function previousEpisodePane(episode) {
+  return `<aside class="writer-side-panel previous-episode-panel" aria-label="이전 화 내용">
+    <div class="writer-panel-head"><span>이전 화</span>${episode ? `<strong>${Number(episode.episodeNo || 0)}화</strong>` : ""}</div>
+    ${
+      episode
+        ? `<h2>${esc(episode.title || "제목 없음")}</h2><div class="previous-episode-body">${episode.body ? renderReader(episode.body) : `<p>본문이 없습니다.</p>`}</div>`
+        : `<div class="empty compact-empty">아직 이전 화가 없습니다.</div>`
+    }
+  </aside>`;
+}
+
+function worldQuickPanel(world, characters, items) {
+  return `<aside class="writer-side-panel world-quick-panel" id="worldQuickPanel" aria-label="세계관 빠른 추가">
+    <div class="writer-panel-head"><span>세계관 빠른 추가</span><button type="button" class="icon-btn quick-close" id="quickWorldClose" aria-label="닫기">×</button></div>
+    ${
+      world
+        ? `<p class="helper quick-world-name">${esc(world.title)}</p>
+          <section class="quick-add-block">
+            <h2>등장인물</h2>
+            <div class="quick-name-strip" id="quickCharacterStrip">${characters.length ? characters.map((character) => `<span>${esc(character.fullName || character.authorLabel || character.name)}</span>`).join("") : `<em>등록된 등장인물이 없습니다.</em>`}</div>
+            <div class="quick-add-grid">
+              <input id="quickCharacterLabel" placeholder="호칭" />
+              <input id="quickCharacterName" placeholder="이름" />
+              <button type="button" class="secondary-btn" id="quickCharacterAdd">추가</button>
+            </div>
+          </section>
+          <section class="quick-add-block">
+            <h2>아이템</h2>
+            <div class="quick-name-strip" id="quickItemStrip">${items.length ? items.map((item) => `<span>${esc(item.name)}</span>`).join("") : `<em>등록된 아이템이 없습니다.</em>`}</div>
+            <div class="quick-add-grid item-quick-grid">
+              <input id="quickItemName" placeholder="이름" />
+              <input id="quickItemTags" placeholder="태그. 쉼표 구분" />
+              <button type="button" class="secondary-btn" id="quickItemAdd">추가</button>
+            </div>
+          </section>`
+        : `<div class="empty compact-empty">연결된 세계관이 없습니다.</div>`
+    }
+  </aside>`;
+}
+
+function toggleQuickWorldPanel() {
+  const panel = $("#worldQuickPanel");
+  if (!panel) return;
+  const opened = panel.classList.toggle("mobile-open");
+  $("#quickWorldToggle")?.setAttribute("aria-expanded", String(opened));
+}
+
+function closeQuickWorldPanel() {
+  $("#worldQuickPanel")?.classList.remove("mobile-open");
+  $("#quickWorldToggle")?.setAttribute("aria-expanded", "false");
+}
+
+function bindQuickWorldForms(work, world, characters = [], items = []) {
+  if (!world) return;
+  $("#quickCharacterAdd")?.addEventListener("click", () => {
+    const label = $("#quickCharacterLabel").value.trim();
+    const fullName = $("#quickCharacterName").value.trim();
+    if (!label || !fullName) return showModal({ body: "등장인물 호칭과 이름을 모두 입력해주세요." });
+    const state = loadState();
+    const character = {
+      id: uid("char"),
+      worldbuildingId: world.id,
+      authorLabel: label,
+      name: label,
+      fullName,
+      publicDescription: "",
+      privateDescription: "",
+      image: "",
+      createdAt: timestamp(),
+      updatedAt: timestamp(),
+    };
+    state.characters.push(character);
+    const stateWorld = state.worldbuildings.find((item) => item.id === world.id);
+    stateWorld.characterIds ||= [];
+    stateWorld.characterIds.push(character.id);
+    saveState(state);
+    characters.push(character);
+    appendQuickName("#quickCharacterStrip", fullName);
+    $("#quickCharacterLabel").value = "";
+    $("#quickCharacterName").value = "";
+    showModal({ body: "등장인물을 추가했습니다." });
+  });
+  $("#quickItemAdd")?.addEventListener("click", () => {
+    const name = $("#quickItemName").value.trim();
+    const tags = splitList($("#quickItemTags").value);
+    if (!name) return showModal({ body: "아이템 이름을 입력해주세요." });
+    const state = loadState();
+    const item = {
+      id: uid("item"),
+      worldbuildingId: world.id,
+      ownerUserId: CURRENT_USER_ID,
+      name,
+      type: "main",
+      priority: 1,
+      tags,
+      itemKind: "normal",
+      defaultAddMessage: `${name}를 손에 넣었다.`,
+      defaultRemoveMessage: `${name}를 잃었다.`,
+      createdAt: timestamp(),
+      updatedAt: timestamp(),
+    };
+    state.items.push(item);
+    const stateWorld = state.worldbuildings.find((entry) => entry.id === world.id);
+    stateWorld.itemIds ||= [];
+    stateWorld.itemIds.push(item.id);
+    saveState(state);
+    items.push(item);
+    appendQuickName("#quickItemStrip", name);
+    $("#quickItemName").value = "";
+    $("#quickItemTags").value = "";
+    showModal({ body: "아이템을 추가했습니다." });
+  });
+}
+
+function appendQuickName(selector, value) {
+  const strip = $(selector);
+  if (!strip) return;
+  strip.querySelector("em")?.remove();
+  const chip = document.createElement("span");
+  chip.textContent = value;
+  strip.append(chip);
+  strip.scrollLeft = strip.scrollWidth;
+}
+
+function bindWorldAutocomplete(textarea, world, characters, items) {
+  if (!textarea || !world) return;
+  $$(".manuscript-suggest").forEach((node) => node.remove());
+  const popup = document.createElement("div");
+  popup.className = "manuscript-suggest hidden";
+  popup.setAttribute("role", "listbox");
+  document.body.append(popup);
+  let activeIndex = 0;
+  let current = null;
+
+  const close = () => {
+    popup.classList.add("hidden");
+    popup.innerHTML = "";
+    current = null;
+    activeIndex = 0;
+  };
+
+  const render = () => {
+    current = findWorldTrigger(textarea);
+    if (!current) return close();
+    const candidates = worldCandidates(current.mark, current.query, characters, items);
+    if (!candidates.length) return close();
+    activeIndex = Math.min(activeIndex, candidates.length - 1);
+    popup.innerHTML = `<div class="suggest-title">${current.mark === "@" ? "이름 후보" : "태그 후보"}</div>${candidates
+      .map(
+        (candidate, index) =>
+          `<button type="button" class="${index === activeIndex ? "active" : ""}" data-suggest-index="${index}" role="option"><strong>${esc(candidate.label)}</strong><span>${esc(candidate.meta)}</span></button>`
+      )
+      .join("")}`;
+    popup.classList.remove("hidden");
+    positionSuggestPopup(textarea, popup, current.start);
+    $$("[data-suggest-index]", popup).forEach((button) =>
+      bindPopupAction(button, () => {
+        applyCandidateChoice(textarea, popup, current, candidates[Number(button.dataset.suggestIndex)], characters, items, close);
+      })
+    );
+  };
+
+  textarea.addEventListener("input", render);
+  textarea.addEventListener("click", render);
+  textarea.addEventListener("keyup", (event) => {
+    if (!["ArrowUp", "ArrowDown", "Enter", "Escape"].includes(event.key)) render();
+  });
+  textarea.addEventListener("keydown", (event) => {
+    if (popup.classList.contains("hidden") || !current) return;
+    if (event.key === "Escape") {
+      event.preventDefault();
+      close();
+      return;
+    }
+    const buttons = $$("[data-suggest-index]", popup);
+    if (!buttons.length) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      activeIndex = (activeIndex + 1) % buttons.length;
+      render();
+    }
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      activeIndex = (activeIndex - 1 + buttons.length) % buttons.length;
+      render();
+    }
+    if (event.key === "Enter" || event.key === "Tab") {
+      event.preventDefault();
+      const candidates = worldCandidates(current.mark, current.query, characters, items);
+      applyCandidateChoice(textarea, popup, current, candidates[activeIndex], characters, items, close);
+    }
+  });
+  textarea.form?.addEventListener("submit", close);
+  window.addEventListener("resize", close);
+}
+
+function bindPopupAction(button, action) {
+  if (!button) return;
+  button.addEventListener("mousedown", (event) => {
+    event.preventDefault();
+  });
+  button.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    action(event);
+  });
+}
+
+function findWorldTrigger(textarea) {
+  const cursor = textarea.selectionStart;
+  if (cursor !== textarea.selectionEnd) return null;
+  const head = textarea.value.slice(0, cursor);
+  const match = head.match(/(^|[\s([{'"“])([@#])([^\s@#\[\]\(\),.:;]*)$/);
+  if (!match) return null;
+  const token = `${match[2]}${match[3]}`;
+  return { mark: match[2], query: match[3] || "", start: cursor - token.length, end: cursor };
+}
+
+function worldCandidates(mark, query, characters, items) {
+  const normalizedQuery = query.trim().toLowerCase();
+  if (mark === "#") {
+    const tagMap = new Map();
+    items.forEach((item) => (item.tags || []).forEach((tag) => tagMap.set(tag, (tagMap.get(tag) || 0) + 1)));
+    characters.forEach((character) => (character.tags || []).forEach((tag) => tagMap.set(tag, (tagMap.get(tag) || 0) + 1)));
+    return Array.from(tagMap.entries())
+      .filter(([tag]) => !normalizedQuery || tag.toLowerCase().includes(normalizedQuery))
+      .sort(([a], [b]) => a.localeCompare(b, "ko"))
+      .slice(0, 8)
+      .map(([tag, count]) => ({ kind: "tag", tag, label: `#${tag}`, meta: `태그 ${count}개 항목` }));
+  }
+  const characterCandidates = characters.map((character) => {
+    const alias = character.authorLabel || character.name || character.fullName || "";
+    const fullName = character.fullName || character.name || alias;
+    return {
+      kind: "entity",
+      label: fullName,
+      meta: "등장인물",
+      searchText: `${alias} ${fullName}`.toLowerCase(),
+      insertText: fullName,
+    };
+  });
+  const itemCandidates = items.map((item) => ({
+    kind: "entity",
+    label: item.name,
+    meta: `아이템 · ${(item.tags || []).join(", ") || "태그 없음"}`,
+    searchText: `${item.authorLabel || ""} ${item.name}`.toLowerCase(),
+    insertText: item.name,
+  }));
+  return [...characterCandidates, ...itemCandidates]
+    .filter((candidate) => !normalizedQuery || candidate.searchText.includes(normalizedQuery))
+    .sort((a, b) => a.label.localeCompare(b.label, "ko"))
+    .slice(0, 8);
+}
+
+function applyCandidateChoice(textarea, popup, trigger, candidate, characters, items, close) {
+  if (!candidate) return;
+  if (candidate.kind === "tag") {
+    showTagModeOptions(textarea, popup, trigger, candidate, characters, items, close);
+    return;
+  }
+  insertCandidate(textarea, trigger, candidate);
+  close();
+}
+
+function showTagModeOptions(textarea, popup, trigger, candidate, characters, items, close) {
+  const entities = tagEntities(candidate.tag, characters, items);
+  popup.innerHTML = `<div class="suggest-title">${esc(candidate.label)} 처리 방식</div>
+    <div class="tag-mode-grid">
+      <button type="button" data-tag-mode="all"><strong>전체</strong><span>이 태그 전체를 선택합니다.</span></button>
+      <button type="button" data-tag-mode="one"><strong>하나</strong><span>이 태그 목록 중 하나를 랜덤 선택합니다.</span></button>
+      <button type="button" data-tag-mode="pick"><strong>선택</strong><span>목록에서 직접 고릅니다.</span></button>
+    </div>`;
+  popup.classList.remove("hidden");
+  positionSuggestPopup(textarea, popup, trigger.start);
+  bindPopupAction($('[data-tag-mode="all"]', popup), () => {
+    replaceTrigger(textarea, trigger, `#${candidate.tag} 전체`);
+    close();
+  });
+  bindPopupAction($('[data-tag-mode="one"]', popup), () => {
+    replaceTrigger(textarea, trigger, `#${candidate.tag} 하나`);
+    close();
+  });
+  bindPopupAction($('[data-tag-mode="pick"]', popup), () => {
+    showTagEntityOptions(textarea, popup, trigger, candidate, entities, close);
+  });
+}
+
+function showTagEntityOptions(textarea, popup, trigger, candidate, entities, close) {
+  popup.innerHTML = `<div class="suggest-title">${esc(candidate.label)}에서 선택</div>${
+    entities.length
+      ? entities
+          .map((entity, index) => `<button type="button" data-tag-entity="${index}"><strong>${esc(entity.name)}</strong><span>${esc(entity.meta)}</span></button>`)
+          .join("")
+      : `<div class="suggest-empty">선택할 항목이 없습니다.</div>`
+  }`;
+  popup.classList.remove("hidden");
+  positionSuggestPopup(textarea, popup, trigger.start);
+  $$("[data-tag-entity]", popup).forEach((button) =>
+    bindPopupAction(button, () => {
+      const entity = entities[Number(button.dataset.tagEntity)];
+      replaceTrigger(textarea, trigger, entity.name);
+      close();
+    })
+  );
+}
+
+function tagEntities(tag, characters, items) {
+  const fromCharacters = characters
+    .filter((character) => (character.tags || []).includes(tag))
+    .map((character) => ({ name: character.fullName || character.name || character.authorLabel, meta: "등장인물" }));
+  const fromItems = items.filter((item) => (item.tags || []).includes(tag)).map((item) => ({ name: item.name, meta: "아이템" }));
+  return [...fromCharacters, ...fromItems].sort((a, b) => a.name.localeCompare(b.name, "ko"));
+}
+
+function replaceTrigger(textarea, trigger, text) {
+  textarea.value = `${textarea.value.slice(0, trigger.start)}${text}${textarea.value.slice(trigger.end)}`;
+  const next = trigger.start + text.length;
+  textarea.focus();
+  textarea.selectionStart = textarea.selectionEnd = next;
+  textarea.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function insertCandidate(textarea, trigger, candidate) {
+  if (!candidate) return;
+  replaceTrigger(textarea, trigger, candidate.insertText);
+}
+
+function positionSuggestPopup(textarea, popup, tokenStart) {
+  const rect = textarea.getBoundingClientRect();
+  const style = getComputedStyle(textarea);
+  const mirror = document.createElement("div");
+  mirror.className = "textarea-caret-mirror";
+  const properties = ["fontFamily", "fontSize", "fontWeight", "fontStyle", "letterSpacing", "lineHeight", "paddingTop", "paddingRight", "paddingBottom", "paddingLeft", "borderTopWidth", "borderRightWidth", "borderBottomWidth", "borderLeftWidth", "boxSizing", "whiteSpace", "wordBreak", "overflowWrap"];
+  properties.forEach((property) => {
+    mirror.style[property] = style[property];
+  });
+  mirror.style.position = "absolute";
+  mirror.style.visibility = "hidden";
+  mirror.style.width = `${rect.width}px`;
+  mirror.style.whiteSpace = "pre-wrap";
+  mirror.style.overflowWrap = "break-word";
+  mirror.textContent = textarea.value.slice(0, tokenStart);
+  const marker = document.createElement("span");
+  marker.textContent = "\u200b";
+  mirror.append(marker);
+  document.body.append(mirror);
+  const markerRect = marker.getBoundingClientRect();
+  const scrollLeft = textarea.scrollLeft;
+  const scrollTop = textarea.scrollTop;
+  const left = Math.min(rect.right - 280, Math.max(rect.left, rect.left + markerRect.left - mirror.getBoundingClientRect().left - scrollLeft));
+  const top = Math.max(8, rect.top + markerRect.top - mirror.getBoundingClientRect().top - scrollTop - popup.offsetHeight - 12);
+  popup.style.left = `${left + window.scrollX}px`;
+  popup.style.top = `${top + window.scrollY}px`;
+  mirror.remove();
 }
 
 function insertText(textarea, text) {
@@ -1571,8 +1965,8 @@ function renderReader(body) {
 }
 
 bindModal();
-$("#exportJson").addEventListener("click", () => showModal({ title: "JSON 내보내기", body: `<pre class="export-box">${esc(exportState())}</pre>` }));
-$("#resetSeed").addEventListener("click", () =>
+$("#exportJson")?.addEventListener("click", () => showModal({ title: "JSON 내보내기", body: `<pre class="export-box">${esc(exportState())}</pre>` }));
+$("#resetSeed")?.addEventListener("click", () =>
   showModal({
     title: "샘플 데이터 다시 넣기",
     body: "현재 localStorage 데이터가 샘플 데이터로 초기화됩니다.",

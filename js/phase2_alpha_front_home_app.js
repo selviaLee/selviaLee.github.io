@@ -1,3 +1,5 @@
+import { formatWalletGold, normalizeWalletSession } from "./currency_wallet.js";
+
 const SESSION_KEY = "supgeul_phase2_alpha_session";
 const PHASE1_KEY = "supgeul_phase1_author_studio_v2";
 const FAVORITE_KEY = "supgeul_phase3_favorites";
@@ -131,7 +133,11 @@ function writeJson(key, value) {
 }
 
 function readSession() {
-  return readJson(SESSION_KEY, { user: null, gold: 0 });
+  return normalizeWalletSession(readJson(SESSION_KEY, { user: null }));
+}
+
+function writeSession(session) {
+  writeJson(SESSION_KEY, normalizeWalletSession(session));
 }
 
 function formatNumber(value) {
@@ -212,13 +218,15 @@ function renderAccount() {
   const session = readSession();
   const loggedIn = Boolean(session.user);
   $("#profileEntry")?.classList.toggle("logged-in", loggedIn);
-  $("#profileEntry").textContent = loggedIn ? "" : "로그인";
+  const profileLabel = $("#profileEntry")?.querySelector(".profile-label");
+  if (profileLabel) profileLabel.textContent = loggedIn ? "" : "로그인";
+  else $("#profileEntry").textContent = loggedIn ? "" : "로그인";
   $("#profileEntry")?.setAttribute("aria-label", loggedIn ? "마이 메뉴" : "로그인 또는 회원가입");
   $("#profileMenu")?.classList.toggle("hidden", true);
   $("#createWorkButton")?.classList.toggle("hidden", !loggedIn);
   $("#walletCard")?.classList.toggle("is-ghost", !loggedIn);
   $("#walletUserName").textContent = session.user?.name || "테스트계정";
-  $("#goldBalance").textContent = `${Number(session.gold || 0).toLocaleString("ko-KR")}숲결`;
+  $("#goldBalance").textContent = formatWalletGold(session);
   $("#walletChargeButton").textContent = "충전";
 }
 
@@ -239,10 +247,8 @@ function renderRecommendations() {
   $("#recommendList").innerHTML = recommendedWorks()
     .map(
       (work) => `<a class="recommend-card" href="${workHref(work)}">
-        <span class="recommend-cover" style="${coverStyle(work)}">
-          <span class="recommend-copy">${esc(work.recommendCopy || "지금 읽기 좋은 숲속의 한 편")}</span>
-          <strong>${esc(work.title)}</strong>
-        </span>
+        <span class="recommend-cover" style="${coverStyle(work)}"></span>
+        <span class="recommend-copy">${esc(work.recommendCopy || "지금 읽기 좋은 숲속의 한 편")}</span>
         <b>${esc(work.title)}</b>
         <em>${esc(work.author)} · ${esc(work.latest)} · ${formatNumber(work.views)}</em>
       </a>`,
@@ -263,11 +269,11 @@ function renderWorks() {
   $("#workList").innerHTML = filteredWorks()
     .sort((a, b) => b.views - a.views)
     .map(
-      (work, index) => `<article class="work-row">
+      (work, index) => `<a class="work-row" href="${workHref(work)}" aria-label="${esc(work.title)} 작품홈으로 이동">
         <strong class="rank-no">${index + 1}</strong>
         <div>
           <div class="work-title-line">
-            <a class="work-title" href="${workHref(work)}">${esc(work.title)}</a>
+            <span class="work-title">${esc(work.title)}</span>
             <span class="title-badge ${work.interactive ? "branch" : "normal"}">${work.interactive ? "갈래글" : "일반글"}</span>
             <span class="title-badge ${work.paid ? "paid" : "free"}">${work.paid ? "유료" : "무료"}</span>
           </div>
@@ -283,7 +289,7 @@ function renderWorks() {
             <span>선호 ${formatNumber(work.favorites)}</span>
           </div>
         </div>
-      </article>`,
+      </a>`,
     )
     .join("");
 }
@@ -340,7 +346,7 @@ function bindEvents() {
   });
 
   $("#logoutUser")?.addEventListener("click", () => {
-    writeJson(SESSION_KEY, { user: null, gold: readSession().gold || 0 });
+    writeSession({ ...readSession(), user: null });
     renderAccount();
     renderRails();
     showToast("로그아웃했습니다.");

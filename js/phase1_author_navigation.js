@@ -14,6 +14,7 @@ export const pageLinks = {
   queue: "author_queue.html",
   notices: "author_notices.html",
   settings: "author_settings.html",
+  editor: "phase1_episode_writer_focus.html",
 };
 
 export function readInitialRoute(defaultPage = "dashboard") {

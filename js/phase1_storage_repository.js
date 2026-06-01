@@ -168,6 +168,209 @@ function seedState() {
   };
 }
 
+function ensureFantasySample(state) {
+  const worldId = "sample_fantasy_world_astral";
+  const workId = "sample_fantasy_work_astral";
+  const episodeIds = ["sample_fantasy_ep_1", "sample_fantasy_ep_2", "sample_fantasy_ep_3"];
+  const characterIds = ["sample_fantasy_char_princess", "sample_fantasy_char_knight", "sample_fantasy_char_mage"];
+  const itemIds = ["sample_fantasy_item_compass", "sample_fantasy_item_sword", "sample_fantasy_item_potion"];
+  const createdAt = "2026-05-30T00:00:00.000Z";
+  if (!state.worldbuildings.some((world) => world.id === worldId)) {
+    state.worldbuildings.push({
+      id: worldId,
+      ownerUserId: CURRENT_USER_ID,
+      title: "별빛 제국 세계관",
+      description: "황녀, 검은 기사, 별의 마법이 얽힌 테스트용 판타지 세계관입니다.",
+      sourceScope: "me",
+      externalSourceName: "",
+      externalAuthorName: "",
+      externalSourceLink: "",
+      workIds: [workId],
+      itemIds: [...itemIds],
+      characterIds: [...characterIds],
+      createdAt,
+      updatedAt: createdAt,
+    });
+  }
+  if (!state.works.some((work) => work.id === workId)) {
+    state.works.push({
+      id: workId,
+      title: "별빛 제국의 문장술사",
+      type: "interactive",
+      userId: CURRENT_USER_ID,
+      temporaryAuthorNickname: "은하필경사",
+      temporaryAuthorNicknameUpdatedAt: createdAt,
+      description: "별빛으로 문장을 새기는 제국에서 황녀와 검은 기사가 금서의 문을 여는 판타지 테스트 작품입니다.",
+      genre1: "여성향",
+      genre2: "창작 웹소설",
+      normalTags: ["FANTASY", "마법", "황녀", "기사"],
+      sensitiveTags: [],
+      isAdult: "all",
+      adultEditable: true,
+      status: "serializing",
+      isPaidWork: false,
+      cover: { mode: "color", color: "#315c8b", showTitle: true },
+      createdAt,
+      updatedAt: createdAt,
+      episodeOrder: [...episodeIds],
+      worldbuildingId: worldId,
+      releaseSettings: { method: "regular", days: ["화", "목", "토"], hour: "21", minute: "00", timezone: "Asia/Seoul" },
+      views: 340,
+      favorites: 42,
+      comments: 8,
+      nextEpisodeWaiters: 31,
+      queueMaxSlots: 3,
+      queueSupportTickets: 2,
+      queueShowEmptySlots: true,
+    });
+  }
+  const sampleCharacters = [
+    {
+      id: characterIds[0],
+      worldbuildingId: worldId,
+      name: "황녀",
+      authorLabel: "황녀",
+      fullName: "엘리시아 루미나",
+      publicDescription: "별빛 문장을 읽는 제국의 황녀입니다.",
+      privateDescription: "금서의 첫 문장을 이미 알고 있습니다.",
+      tags: ["황녀", "왕가", "별빛"],
+      image: "",
+    },
+    {
+      id: characterIds[1],
+      worldbuildingId: worldId,
+      name: "검은기사",
+      authorLabel: "검은기사",
+      fullName: "카이론 발렌",
+      publicDescription: "황녀를 호위하는 침묵의 기사입니다.",
+      privateDescription: "잃어버린 북부 왕가의 후계자입니다.",
+      tags: ["기사", "왕가", "북부"],
+      image: "",
+    },
+    {
+      id: characterIds[2],
+      worldbuildingId: worldId,
+      name: "대마법사",
+      authorLabel: "대마법사",
+      fullName: "세르하 루엔",
+      publicDescription: "제국 천문탑의 주인입니다.",
+      privateDescription: "별의나침반을 만든 장본인입니다.",
+      tags: ["마법사", "천문탑", "마도구"],
+      image: "",
+    },
+  ];
+  sampleCharacters.forEach((character) => {
+    const existing = state.characters.find((entry) => entry.id === character.id);
+    if (existing) {
+      existing.tags = existing.tags?.length ? existing.tags : character.tags;
+    } else {
+      state.characters.push({ ...character, createdAt, updatedAt: createdAt });
+    }
+  });
+  const sampleItems = [
+    {
+      id: itemIds[0],
+      worldbuildingId: worldId,
+      ownerUserId: CURRENT_USER_ID,
+      name: "별의나침반",
+      type: "main",
+      priority: 3,
+      tags: ["마도구", "별빛", "탐색"],
+      itemKind: "normal",
+      defaultAddMessage: "별의나침반이 북쪽이 아닌 운명을 가리켰다.",
+      defaultRemoveMessage: "별의나침반의 빛이 꺼졌다.",
+    },
+    {
+      id: itemIds[1],
+      worldbuildingId: worldId,
+      ownerUserId: CURRENT_USER_ID,
+      name: "용린검",
+      type: "main",
+      priority: 2,
+      tags: ["무기", "용", "왕가"],
+      itemKind: "normal",
+      defaultAddMessage: "용린검이 손안에서 낮게 울었다.",
+      defaultRemoveMessage: "용린검이 칼집 속으로 잠들었다.",
+    },
+    {
+      id: itemIds[2],
+      worldbuildingId: worldId,
+      ownerUserId: CURRENT_USER_ID,
+      name: "달빛물약",
+      type: "sub",
+      priority: 1,
+      tags: ["소모품", "회복", "연금술"],
+      itemKind: "normal",
+      defaultAddMessage: "달빛물약을 얻었다.",
+      defaultRemoveMessage: "달빛물약을 사용했다.",
+    },
+  ];
+  sampleItems.forEach((item) => {
+    const existing = state.items.find((entry) => entry.id === item.id);
+    if (existing) {
+      existing.tags = existing.tags?.length ? existing.tags : item.tags;
+    } else {
+      state.items.push({ ...item, createdAt, updatedAt: createdAt });
+    }
+  });
+  const sampleEpisodes = [
+    {
+      id: episodeIds[0],
+      workId,
+      episodeNo: 1,
+      requiredPreviousEpisodeNo: "",
+      title: "별이 떨어진 밤",
+      body: "제국의 하늘에서 가장 오래된 별이 떨어졌다.\n\n엘리시아 루미나는 깨진 천문판 앞에서 피 묻은 문장을 읽었다.\n\n[[+별의나침반]]\n별의나침반이 북쪽이 아닌 운명을 가리켰다.",
+      authorNote: "테스트용 판타지 샘플 1화입니다.",
+      status: "published",
+    },
+    {
+      id: episodeIds[1],
+      workId,
+      episodeNo: 2,
+      requiredPreviousEpisodeNo: 1,
+      title: "검은 기사의 서약",
+      body: "새벽 종이 울리기 전, 카이론 발렌이 황녀 앞에 무릎을 꿇었다.\n\n[[선택지:\n별의나침반을 건넨다 [[있다면:별의나침반]]\n용린검을 찾으러 간다\n]]\n\n[[씬:별의나침반을 건넨다\n나침반의 바늘이 검은 기사의 심장을 향했다.\n[[+용린검]]\n]]",
+      authorNote: "선택지와 아이템 조건 확인용 샘플입니다.",
+      status: "published",
+    },
+    {
+      id: episodeIds[2],
+      workId,
+      episodeNo: 3,
+      requiredPreviousEpisodeNo: 2,
+      title: "천문탑의 금서",
+      body: "#마도구 전체가 붙은 물건들은 밤이 깊을수록 스스로 빛났다.\n\n세르하 루엔은 금서의 봉인을 풀며 말했다.\n\n[[+달빛물약]]\n달빛물약을 얻었다.\n\n[[-별의나침반]]\n별의나침반의 빛이 금서 속으로 빨려 들어갔다.",
+      authorNote: "태그 검색과 아이템 소실 문법 확인용 샘플입니다.",
+      status: "queued",
+    },
+  ];
+  sampleEpisodes.forEach((episode) => {
+    const existing = state.episodes.find((entry) => entry.id === episode.id);
+    if (existing) {
+      const hasLegacySearchText = /[@#][^\s\]]+:"/.test(existing.body || "");
+      if (hasLegacySearchText) {
+        existing.body = episode.body;
+        existing.updatedAt = createdAt;
+      }
+    } else {
+      state.episodes.push({
+        ...episode,
+        publishAt: episode.status === "published" ? createdAt : "",
+        isPaid: false,
+        price: 0,
+        createdAt,
+        updatedAt: createdAt,
+      });
+    }
+  });
+  if (!state.homeIndex.some((entry) => entry.workId === workId)) {
+    state.homeIndex.push({ workId, episodeId: episodeIds[0], publishedAt: createdAt });
+    state.homeIndex.push({ workId, episodeId: episodeIds[1], publishedAt: createdAt });
+  }
+  return state;
+}
+
 function normalize(state) {
   const fallback = seedState();
   if (!state || typeof state !== "object" || Array.isArray(state)) state = fallback;
@@ -182,6 +385,7 @@ function normalize(state) {
   if (!Array.isArray(state.noticeTemplates)) state.noticeTemplates = [];
   if (!Array.isArray(state.workNotices)) state.workNotices = [];
   if (!Array.isArray(state.homeIndex)) state.homeIndex = [];
+  ensureFantasySample(state);
   state.authorState ||= fallback.authorState;
   state.users[0] ||= fallback.users[0];
   state.users[0].officialNickname ||= "나무나비";
@@ -221,6 +425,7 @@ function normalize(state) {
     character.name ||= character.authorLabel;
     character.fullName ||= "";
     character.image ||= "";
+    character.tags ||= [];
   });
   state.episodes.forEach((episode) => {
     episode.requiredPreviousEpisodeNo ??= "";

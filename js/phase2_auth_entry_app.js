@@ -1,3 +1,5 @@
+import { normalizeWalletSession } from "./currency_wallet.js";
+
 const SESSION_KEY = "supgeul_phase2_alpha_session";
 
 let toastTimer = null;
@@ -6,14 +8,14 @@ const $ = (selector) => document.querySelector(selector);
 
 function readSession() {
   try {
-    return JSON.parse(localStorage.getItem(SESSION_KEY)) || { user: null, gold: 0 };
+    return normalizeWalletSession(JSON.parse(localStorage.getItem(SESSION_KEY)) || { user: null });
   } catch {
-    return { user: null, gold: 0 };
+    return normalizeWalletSession({ user: null });
   }
 }
 
 function writeSession(session) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  localStorage.setItem(SESSION_KEY, JSON.stringify(normalizeWalletSession(session)));
 }
 
 function nextPage() {
@@ -34,12 +36,12 @@ function showToast(message) {
 function login(provider) {
   const session = readSession();
   writeSession({
+    ...session,
     user: {
       name: "테스트계정",
       provider,
       joinedAt: new Date().toISOString(),
     },
-    gold: Number(session.gold || 0),
   });
   showToast("테스트계정으로 로그인했습니다.");
   setTimeout(() => {

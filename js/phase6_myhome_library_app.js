@@ -1,3 +1,5 @@
+import { normalizeWalletSession } from "./currency_wallet.js";
+
 const SESSION_KEY = "supgeul_phase2_alpha_session";
 const PHASE1_KEY = "supgeul_phase1_author_studio_v2";
 const FAVORITE_KEY = "supgeul_phase3_favorites";
@@ -202,11 +204,11 @@ function writeJson(key, value) {
 }
 
 function readSession() {
-  return readJson(SESSION_KEY, { user: null, gold: 0 });
+  return normalizeWalletSession(readJson(SESSION_KEY, { user: null }));
 }
 
 function writeSession(session) {
-  writeJson(SESSION_KEY, session);
+  writeJson(SESSION_KEY, normalizeWalletSession(session));
 }
 
 function clonePlain(value) {
@@ -548,11 +550,10 @@ function renderEndings() {
   $("#endingList").innerHTML = endings
     .map(
       (ending) => `<button class="ending-card ${ending.collected ? "" : "is-locked"} ${activeEndingId === ending.id ? "active" : ""}" type="button" data-ending-id="${esc(ending.id)}">
-        <span class="ending-cover" style="${endingCoverStyle(ending)}">
-          <strong>${ending.collected ? esc(ending.title) : "잠긴 엔딩"}</strong>
-        </span>
+        <span class="ending-cover" style="${endingCoverStyle(ending)}"></span>
         <span class="ending-card-info">
-          <b>${esc(ending.workTitle || workById(ending.workId)?.title || "작품")}</b>
+          <b>${ending.collected ? esc(ending.title) : "잠긴 엔딩"}</b>
+          <span>${esc(ending.workTitle || workById(ending.workId)?.title || "작품")}</span>
           <em>${ending.collected ? `${formatDate(ending.reachedAt)} 도달` : "아직 도달하지 않았습니다."}</em>
         </span>
       </button>`,
@@ -600,7 +601,7 @@ function renderActiveView() {
 function ensureAlphaUser() {
   const session = readSession();
   if (session.user) return;
-  writeSession({ user: { name: "테스트계정", provider: "alpha", joinedAt: new Date().toISOString() }, gold: Number(session.gold || 0) });
+  writeSession({ ...session, user: { name: "테스트계정", provider: "alpha", joinedAt: new Date().toISOString() } });
 }
 
 function renderGate() {
@@ -744,7 +745,7 @@ function bindEvents() {
 
   $("#testLoginButton")?.addEventListener("click", () => {
     const session = readSession();
-    writeSession({ user: { name: "테스트계정", provider: "alpha", joinedAt: new Date().toISOString() }, gold: Number(session.gold || 0) });
+    writeSession({ ...session, user: { name: "테스트계정", provider: "alpha", joinedAt: new Date().toISOString() } });
     location.reload();
   });
 

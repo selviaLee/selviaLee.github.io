@@ -431,30 +431,13 @@ select {
 .ending-cover {
   position: relative;
   display: grid;
-  place-items: center;
   min-height: 150px;
-  padding: 16px;
   background-size: cover !important;
   background-position: center !important;
-  color: #fff;
-  isolation: isolate;
 }
 
 .ending-cover::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(180deg, rgba(13, 24, 18, 0.08), rgba(13, 24, 18, 0.62));
-}
-
-.ending-cover strong {
-  font-size: 18px;
-  font-weight: 900;
-  line-height: 1.28;
-  text-align: center;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-  word-break: keep-all;
+  content: none;
 }
 
 .ending-card-info {
@@ -464,6 +447,7 @@ select {
 }
 
 .ending-card-info b,
+.ending-card-info span,
 .ending-card-info em {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -473,6 +457,12 @@ select {
 .ending-card-info b {
   color: var(--myhome-ink);
   font-size: 14px;
+}
+
+.ending-card-info span {
+  color: var(--myhome-accent);
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .ending-card-info em {
@@ -490,7 +480,10 @@ select {
 }
 
 .ending-card.is-locked .ending-cover::before {
-  background: rgba(21, 26, 23, 0.68);
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(21, 26, 23, 0.2);
 }
 
 .ending-detail {

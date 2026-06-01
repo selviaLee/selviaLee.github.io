@@ -1,3 +1,5 @@
+import { addPaidGold, formatWalletGold, normalizeWalletSession } from "./currency_wallet.js";
+
 const SESSION_KEY = "supgeul_phase2_alpha_session";
 
 const products = {
@@ -40,14 +42,14 @@ function esc(value = "") {
 
 function readSession() {
   try {
-    return JSON.parse(localStorage.getItem(SESSION_KEY)) || { user: null, gold: 0 };
+    return normalizeWalletSession(JSON.parse(localStorage.getItem(SESSION_KEY)) || { user: null });
   } catch {
-    return { user: null, gold: 0 };
+    return normalizeWalletSession({ user: null });
   }
 }
 
 function writeSession(session) {
-  localStorage.setItem(SESSION_KEY, JSON.stringify(session));
+  localStorage.setItem(SESSION_KEY, JSON.stringify(normalizeWalletSession(session)));
 }
 
 function formatNumber(value) {
@@ -75,7 +77,7 @@ function ensureLogin() {
 
 function renderBalance() {
   const session = readSession();
-  $("#shopGoldBalance").textContent = `${formatNumber(session.gold)}숲결`;
+  $("#shopGoldBalance").textContent = formatWalletGold(session);
 }
 
 function renderGoldProducts() {
@@ -133,8 +135,7 @@ function chargeSelectedProduct() {
   const session = ensureLogin();
   if (!session) return;
   const product = selectedProduct();
-  session.gold = Number(session.gold || 0) + product.gold;
-  writeSession(session);
+  writeSession(addPaidGold(session, product.gold));
   renderBalance();
   showToast(`${formatNumber(product.gold)}숲결이 충전되었습니다.`);
   setTimeout(() => {

@@ -1,3 +1,5 @@
+import { normalizeWalletSession } from "./currency_wallet.js";
+
 const PHASE1_KEY = "supgeul_phase1_author_studio_v2";
 const SESSION_KEY = "supgeul_phase2_alpha_session";
 const FAVORITE_KEY = "supgeul_phase3_favorites";
@@ -103,7 +105,7 @@ function readJson(key, fallback) {
 }
 
 function readSession() {
-  return readJson(SESSION_KEY, { user: null, gold: 0 });
+  return normalizeWalletSession(readJson(SESSION_KEY, { user: null }));
 }
 
 function formatNumber(value) {
@@ -238,7 +240,7 @@ function renderTopCovers() {
     .map(
       (work, index) => `<a class="best-cover-card" href="${workHref(work)}">
         <span class="best-cover-rank">${index + 1}</span>
-        <span class="best-cover" style="${coverStyle(work)}">${work.cover?.showTitle === false ? "" : esc(work.title)}</span>
+        <span class="best-cover" style="${coverStyle(work)}"></span>
         <strong>${esc(work.title)}</strong>
         <span>${esc(work.author)} · ${periodLabels[activePeriod]} ${formatNumber(rankingValue(work))}</span>
       </a>`,
